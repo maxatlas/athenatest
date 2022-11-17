@@ -4,8 +4,11 @@ import config as c
 from pathlib import Path
 
 
-def get_mce(y_conf: torch.Tensor, y_true: torch.Tensor):
-    mce = 0
+def get_mce(y_conf_1d: torch.Tensor, y_pred_true: torch.Tensor):
+    boundaries = torch.arange(0, 1.01, 1/c.k)
+    y_conf_by_b = torch.bucketize(y_conf_1d, boundaries)
+    n = len(y_conf_1d)
+    mce = max([torch.div(*get_ce_per_bucket(b, y_conf_by_b, y_pred_true)) for b in range(c.n_class)])
     return mce
 
 
@@ -16,20 +19,20 @@ def get_ece(y_conf_1d: torch.Tensor, y_pred_true: torch.Tensor):
     :param y_pred_true: 1d binary prediction tensor for true labels
     :return: ECE
     """
-    boundaries = torch.arange(0, 1.01, 0.1)
+    boundaries = torch.arange(0, 1.01, 1/c.k)
     y_conf_by_b = torch.bucketize(y_conf_1d, boundaries)
     n = len(y_conf_1d)
-    ece = sum([get_ece_per_bucket(b, y_conf_by_b, y_pred_true) for b in range(c.n_class)]) / n
+    ece = sum([torch.mul(*get_ce_per_bucket(b, y_conf_by_b, y_pred_true)) for b in range(c.n_class)]) / n
     return ece
 
 
-def get_ece_per_bucket(b:int, y_conf_by_b, y_pred_true):
+def get_ce_per_bucket(b: int, y_conf_by_b, y_pred_true):
     indices_b = (y_conf_by_b == b).nonzero()
     n = sum(indices_b)
     y_conf_b = torch.sum(y_conf_by_b[indices_b]) / n
     y_pred_b = torch.sum(y_pred_true[indices_b]) / n
-    out = torch.abs(y_pred_b - y_conf_b) + n
-    return out * n
+    out = torch.abs(y_pred_b - y_conf_b)
+    return out, torch.tensor(n)
 
 
 def get_confusion_matrix(y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
