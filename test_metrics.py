@@ -5,13 +5,13 @@ from metrics import *
 import torch.nn.functional as F
 
 
-X, y = get_MNIST_test_set()
+tester = get_MNIST_test_set()
 
-tester = enumerate(test_loader)
-_, (_, y_1) = next(tester)
+_, (X, y_1) = next(tester)
 _, (_, y_2) = next(tester)
 
 model = Model()
+
 model.eval()
 y_pred, y_conf = model.batch_eval(X)
 
@@ -37,20 +37,20 @@ def test_get_ece(y_pred_1d, y_conf_2d, y_true_2d):
 
 
 def test_cm():
-    cm = get_confusion_matrix(y_1, y_2)
+    cm0 = init_confusion_matrix(y_1)
+    cm = get_confusion_matrix(y_1, y_2, cm0)
     print(cm)
-    cm = get_confusion_matrix(y_1, y_1)
+    cm = get_confusion_matrix(y_1, y_1, cm0)
     print(cm)
+    test_plot_cm(cm)
     return
 
 
-def test_plot_cm():
-    cm = get_confusion_matrix(y_1, y_2)
+def test_plot_cm(cm):
     plot_confusion_matrix(cm, "vis/cm.png", benchmark_session_id="model_v1+MNIST")
 
 
 if __name__ == "__main__":
-    test_plot_cm()
+    test_get_ece(y_pred, y_conf, y_1)
     # print(test_cm())
-    test_get_ece(y_pred, y_conf, y)
 

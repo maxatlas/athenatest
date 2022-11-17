@@ -24,6 +24,5 @@ def get_MNIST_test_set():
       batch_size=c.batch_size_test, shuffle=True)
 
     tester = enumerate(test_loader)
-    batch_idx, (X, y) = next(tester)
-    return X, y
+    return tester
 
