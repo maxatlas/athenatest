@@ -2,9 +2,12 @@
 Define hyper-parameters here.
 
 """
+from hashlib import sha256
 
 delimiter = "+"
 min_n = 20
+hash_func = sha256
+temperature = 2
 
 deviation_threshold = 0.1
 
@@ -15,9 +18,3 @@ mce_table_name = "MCE"
 ece_table_name = "ECE"
 cm_table_name = "confusion_matrix"
 
-batch_size_test = 100
-n_class = 10
-
-random_seed = 1
-
-k = 10

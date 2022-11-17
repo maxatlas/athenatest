@@ -59,12 +59,13 @@ print("\nDataset %s loaded." % dataset_id)
 eval_res = {}
 
 model.eval()
+
 for batch_id, (X, y) in enumerate(test_loader):
 
     y_predict, y_conf = model.forward(X)
     eval_res[c.mce_table_name] = get_mce(y_conf, y, benchmark_session_id)
     eval_res[c.ece_table_name] = get_ece(y_conf, y, benchmark_session_id)
-    eval_res[c.cm_table_name] = get_confusion_matrix(y_predict, y, benchmark_session_id)
+    eval_res[c.cm_table_name] = get_confusion_matrix(y_predict, y)
 
 
 """Store results to no/sql database/ whatever logging system in place."""
