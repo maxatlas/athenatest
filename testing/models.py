@@ -23,7 +23,7 @@ class Model(nn.Module):
         probs = torch.sigmoid(logits)
         preds = torch.argmax(logits, dim=1)
 
-        return probs, preds
+        return preds, probs
 
 
 if __name__ == "__main__":

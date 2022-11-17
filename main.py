@@ -51,17 +51,20 @@ print("Folders created.")
 """Load models and dataset per identifiers"""
 model = load_model(model_id)
 print("\nModel %s loaded." % model_id)
-dataset = load_dataset(dataset_id)
+test_loader = load_dataset(dataset_id)
 print("\nDataset %s loaded." % dataset_id)
 
 
 """Evaluate model"""
 eval_res = {}
 
-y_predict = model.forward(dataset.X)
-eval_res[c.mce_table_name] = get_mce(y_predict, dataset.y, benchmark_session_id)
-eval_res[c.ece_table_name] = get_ece(y_predict, dataset.y, benchmark_session_id)
-eval_res[c.cm_table_name] = get_confusion_matrix(y_predict, dataset.y, benchmark_session_id)
+model.eval()
+for batch_id, (X, y) in enumerate(test_loader):
+
+    y_predict, y_conf = model.forward(X)
+    eval_res[c.mce_table_name] = get_mce(y_conf, y, benchmark_session_id)
+    eval_res[c.ece_table_name] = get_ece(y_conf, y, benchmark_session_id)
+    eval_res[c.cm_table_name] = get_confusion_matrix(y_predict, y, benchmark_session_id)
 
 
 """Store results to no/sql database/ whatever logging system in place."""

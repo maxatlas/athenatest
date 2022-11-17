@@ -2,11 +2,9 @@
 Define hyper-parameters here.
 
 """
-from hashlib import sha256
 
-delimiter = ","
+delimiter = "+"
 min_n = 20
-hash_func = sha256
 
 deviation_threshold = 0.1
 

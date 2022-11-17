@@ -1,9 +1,9 @@
 import os
 import config as c
+import torch
 import shutil
 
 from pathlib import Path
-from datetime import datetime
 
 
 def init_folders(session_id):
@@ -42,11 +42,8 @@ def get_session_id(raw_model_ids: str, dataset_id: str):
     Calculate timestamp if not given.
     :param raw_model_ids:
     :param dataset_id:
-    :param timestamp:
     :return:
     """
     session_id = "%s%s%s" % (raw_model_ids, c.delimiter, dataset_id)
     return session_id
-
-
 
