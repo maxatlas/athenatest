@@ -20,9 +20,14 @@ class Model(nn.Module):
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
         logits = F.log_softmax(x)
-        probs = torch.sigmoid(logits)
-        preds = torch.argmax(logits, dim=1)
 
+        return logits
+
+    def batch_eval(self, x):
+        with torch.no_grad():
+            logits = self.forward(x)
+            probs = torch.sigmoid(logits)
+            preds = torch.argmax(probs, dim=1)
         return preds, probs
 
 
