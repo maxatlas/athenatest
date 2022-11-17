@@ -15,12 +15,16 @@ def get_ece(y_conf: torch.Tensor, y_true: torch.Tensor, benchmark_session_id: st
     return ece
 
 
-def get_confusion_matrix(y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-    n_class = len(y_true[0])
-    cm = torch.zeros(n_class, n_class).int()
+def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, cm: torch.Tensor) -> torch.Tensor:
     y_pred, y_true = torch.argmax(y_pred, dim=1), torch.argmax(y_true, dim=1)
     for true_i, pred_i in zip(y_true, y_pred):
         cm[true_i][pred_i] += 1
+    return cm
+
+
+def init_confusion_matrix(y_true: torch.Tensor) -> torch.Tensor:
+    n_class = len(y_true[0])
+    cm = torch.zeros(n_class, n_class).int()
     return cm
 
 
