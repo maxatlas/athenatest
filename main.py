@@ -4,8 +4,7 @@ import config as c
 from utils import (init_folders,
                    load_model, load_dataset,
                    get_session_id)
-from metrics import (get_mce, get_ece, get_confusion_matrix,
-                     plot_mce, plot_ece, plot_confusion_matrix,)
+from metrics import (get_mce, get_ece, get_confusion_matrix, plot_ce, plot_confusion_matrix,)
 
 
 """Ask for inputs"""

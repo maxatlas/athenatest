@@ -22,7 +22,5 @@ def get_MNIST_test_set():
                                      lambda x: F.one_hot(x, 10)]),
                                  ),
       batch_size=c.batch_size_test, shuffle=True)
-
-    tester = enumerate(test_loader)
-    return tester
+    return test_loader
 

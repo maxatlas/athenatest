@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import config as c
 
 
-def get_mce(ce, y_true):
+def get_mce(ce):
     mce = max([ce_by_b[0] for ce_by_b in ce])
     return mce
 
@@ -22,7 +22,6 @@ def get_ce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
     :param y_pred_true: 1d binary prediction tensor for true labels
     :return: [(CE/bucket, n/bucket)]
     """
-    n = len(y_conf_true)
     ce = [get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true) for b in range(c.n_class)]
     return ce
 
@@ -51,14 +50,6 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
     return out, torch.tensor(n)
 
 
-def plot_ce(ce: torch.Tensor, boundaries, save_file):
-    ce = [float(ce_per_b[0]) for ce_per_b in ce]
-    plt.bar(boundaries[1:]-1/(2*c.k), ce, width=1/c.k)
-    plt.title("Calibrated Error over %i Bins" % c.k)
-    plt.xticks(boundaries)
-    plt.savefig(save_file)
-
-
 def get_y_conf_true(y_conf_2d, y_true_1d):
     """
 
@@ -80,6 +71,14 @@ def get_y_pred_true(y_pred_1d, y_true_1d):
     """
     out = y_pred_1d.eq(y_true_1d).int().flatten()
     return out
+
+
+def plot_ce(ce: torch.Tensor, boundaries, save_file):
+    ce = [float(ce_per_b[0]) for ce_per_b in ce]
+    plt.bar(boundaries[1:]-1/(2*c.k), ce, width=1/c.k)
+    plt.title("Calibrated Error over %i Bins" % c.k)
+    plt.xticks(boundaries)
+    plt.savefig(save_file)
 
 
 def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r,

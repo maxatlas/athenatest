@@ -5,7 +5,8 @@ from metrics import *
 import torch.nn.functional as F
 
 
-tester = get_MNIST_test_set()
+test_loader = get_MNIST_test_set()
+tester = enumerate(test_loader)
 
 _, (X, y_1) = next(tester)
 _, (_, y_2) = next(tester)
