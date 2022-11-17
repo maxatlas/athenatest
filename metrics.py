@@ -27,6 +27,19 @@ def get_ce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
     return ce
 
 
+def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, cm: torch.Tensor) -> torch.Tensor:
+    y_pred, y_true = torch.argmax(y_pred, dim=1), torch.argmax(y_true, dim=1)
+    for true_i, pred_i in zip(y_true, y_pred):
+        cm[true_i][pred_i] += 1
+    return cm
+
+
+def init_confusion_matrix(y_true: torch.Tensor) -> torch.Tensor:
+    n_class = len(y_true[0])
+    cm = torch.zeros(n_class, n_class).int()
+    return cm
+
+
 def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
     indices_b = (b_by_conf == b).int()
     n = sum(indices_b)
@@ -36,15 +49,6 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
     y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
     out = torch.abs(y_pred_b - y_conf_b) / n
     return out, torch.tensor(n)
-
-
-def get_confusion_matrix(y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-    return
-
-
-def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r,
-                          benchmark_session_id: str = ""):
-    return
 
 
 def plot_ce(ce: torch.Tensor, boundaries, save_file):
@@ -77,4 +81,18 @@ def get_y_pred_true(y_pred_1d, y_true_1d):
     out = y_pred_1d.eq(y_true_1d).int().flatten()
     return out
 
+
+def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r,
+                          benchmark_session_id: str = ""):
+    dim_cm = cm.shape[0]
+    plt.matshow(cm, cmap=cmap)
+    plt.title("Confusion Matrix\nfor %s" % benchmark_session_id)
+    plt.colorbar()
+    tick_marks = range(dim_cm)
+    plt.xticks(tick_marks, range(dim_cm))
+    plt.yticks(tick_marks, range(dim_cm))
+    plt.xlabel("True class")
+    plt.ylabel("Predicted class")
+
+    plt.savefig(save_path)
 
