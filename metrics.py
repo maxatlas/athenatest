@@ -1,7 +1,6 @@
 import torch
 import matplotlib.pyplot as plt
 import config as c
-from pathlib import Path
 
 
 def get_mce(ce, y_true):
