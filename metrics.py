@@ -4,23 +4,28 @@ import config as c
 from pathlib import Path
 
 
-def get_mce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
-    n = len(y_conf_true)
-    mce = max([get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true)[0] for b in range(c.n_class)])
+def get_mce(ce, y_true):
+    mce = max([ce_by_b[0] for ce_by_b in ce])
     return mce
 
 
-def get_ece(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
+def get_ece(ce, y_true):
+    n = len(y_true)
+    ece = sum([torch.mul(*ce_by_b) for ce_by_b in ce]) / n
+    return ece
+
+
+def get_ce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
     """
     Bucketize y_conf_1d
     :param b_by_conf:
     :param y_conf_true: 1d confidence tensor for true labels
     :param y_pred_true: 1d binary prediction tensor for true labels
-    :return: ECE
+    :return: [(CE/bucket, n/bucket)]
     """
     n = len(y_conf_true)
-    ece = sum([torch.mul(*get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true)) for b in range(c.n_class)]) / n
-    return ece
+    ce = [get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true) for b in range(c.n_class)]
+    return ce
 
 
 def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
@@ -38,19 +43,17 @@ def get_confusion_matrix(y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Te
     return
 
 
-def plot_mce(df: torch.Tensor, save_path: str):
-    # save fig in folder
-    return
-
-
-def plot_ece(df: torch.Tensor, save_path: str):
-    # save fig in folder
-    return
-
-
 def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r,
                           benchmark_session_id: str = ""):
     return
+
+
+def plot_ce(ce: torch.Tensor, boundaries, save_file):
+    ce = [float(ce_per_b[0]) for ce_per_b in ce]
+    plt.bar(boundaries[1:]-1/(2*c.k), ce, width=1/c.k)
+    plt.title("Calibrated Error over %i Bins" % c.k)
+    plt.xticks(boundaries)
+    plt.savefig(save_file)
 
 
 def get_y_conf_true(y_conf_2d, y_true_1d):
