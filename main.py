@@ -29,7 +29,7 @@ parser.add_argument('--min_size',
                     type=int,
                     required=False,
                     default=c.min_n,
-                    help="Minimum sample size to test deviation from benchmarking result.")
+                    help="Minimum sample size to testing deviation from benchmarking result.")
 parser.add_argument('--dev_thresh',
                     '-t',
                     type=float,
