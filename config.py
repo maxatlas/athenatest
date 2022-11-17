@@ -15,3 +15,6 @@ mce_table_name = "MCE"
 ece_table_name = "ECE"
 cm_table_name = "confusion_matrix"
 
+batch_size = 100
+n_class = 10
+
