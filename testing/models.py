@@ -24,6 +24,7 @@ class Model(nn.Module):
         return logits
 
     def batch_eval(self, x):
+        self.eval()
         with torch.no_grad():
             logits = self.forward(x)
             probs = torch.sigmoid(logits)

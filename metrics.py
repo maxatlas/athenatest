@@ -80,12 +80,12 @@ def get_y_pred_true(y_pred_1d, y_true_1d):
     return out
 
 
-def plot_ce(ce: torch.Tensor, boundaries, save_file):
+def plot_ce(ce: torch.Tensor, boundaries, save_path):
     ce = [float(ce_per_b[0]) for ce_per_b in ce]
     plt.bar(boundaries[1:]-1/(2*c.k), ce, width=1/c.k)
     plt.title("Calibrated Error over %i Bins" % c.k)
     plt.xticks(boundaries)
-    plt.savefig(save_file)
+    plt.savefig(save_path)
 
 
 def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r,

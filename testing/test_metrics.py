@@ -1,20 +1,10 @@
-import torch
-from testing.dataset import get_MNIST_test_set
-from testing.models import Model
+from Tester import Tester
 from metrics import *
-import torch.nn.functional as F
 
 
-test_loader = get_MNIST_test_set()
-tester = enumerate(test_loader)
-
-_, (X, y_1) = next(tester)
-_, (_, y_2) = next(tester)
-
-model = Model()
-
-model.eval()
-y_pred, y_conf = model.batch_eval(X)
+tester = Tester()
+_, y_1, y_pred, y_conf = tester.next()
+_, y_2, _, _ = tester.next()
 
 
 def test_get_ece(y_pred_1d, y_conf_2d, y_true_1d):
@@ -25,13 +15,13 @@ def test_get_ece(y_pred_1d, y_conf_2d, y_true_1d):
     b_by_conf = torch.bucketize(y_conf_true, boundaries)
     ce = get_ce(b_by_conf, y_conf_true, y_pred_true)
 
-    plot_ce(ce, boundaries, save_file="vis/ce.png")
+    plot_ce(ce, boundaries, save_path="../vis/ce.png")
 
     mce = get_mce(ce)
     ece = get_ece(ce, y_true_1d)
 
-    assert round(float(ece), 4) == 0.1801
-    assert round(float(mce), 4) == 0.6946
+    assert round(float(ece), 4) == 0.1793
+    assert round(float(mce), 4) == 0.4407
 
     return mce, ece
 
@@ -47,7 +37,7 @@ def test_cm(verbatim=True):
 
 
 def test_plot_cm(cm):
-    plot_confusion_matrix(cm, "vis/cm.png", benchmark_session_id="model_v1+MNIST")
+    plot_confusion_matrix(cm, "../vis/cm.png", benchmark_session_id="model_v1+MNIST")
 
 
 if __name__ == "__main__":

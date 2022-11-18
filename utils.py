@@ -5,6 +5,8 @@ import torch
 from pathlib import Path
 from metrics import get_y_pred_true
 
+from torchvision.utils import save_image
+
 
 def init_folders(session_id):
     """
@@ -48,8 +50,16 @@ def get_session_id(raw_model_ids: str, dataset_id: str):
     return session_id
 
 
-def get_FP_samples(X, y_pred_1d, y_true_1d, save_path):
-    correct_ids = get_y_pred_true(y_pred_1d, y_true_1d)
+def get_FP_samples(X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
+    correct_ids = get_y_pred_true(y_pred_1d, y_true_1d).bool().nonzero().flatten()
     samples = X[correct_ids, :]
+    return samples
+
+
+def save_FP_samples(samples: torch.Tensor, save_path: str):
+    save_path = Path(save_path) if type(save_path) is not Path else save_path
+    for i, sample in enumerate(samples):
+        save_image(sample, save_path/("%i.png" % i))
+        torch.save(sample, save_path/("%i.tensor" % i))
 
 
