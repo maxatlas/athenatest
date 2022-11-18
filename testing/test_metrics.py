@@ -6,6 +6,21 @@ tester = Tester()
 _, y_1, y_pred, y_conf = tester.next()
 _, y_2, _, _ = tester.next()
 
+y_conf_2d = torch.tensor([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+y_true_1d = torch.tensor([0, 1, 1])
+y_pred_1d = torch.argmax(y_conf_2d, dim=1)
+
+
+def test_get_y_conf_true():
+    out = get_y_conf_true(y_conf_2d, y_true_1d).tolist()
+    out = [round(i, 1) for i in out]
+    assert out == [0.2, 0.4, 0.9]
+
+
+def test_get_y_pred_true():
+    out = get_y_pred_true(y_pred_1d, y_true_1d).tolist()
+    assert out == [0, 0, 1]
+
 
 def test_get_ece(y_pred_1d, y_conf_2d, y_true_1d):
     y_pred_true = get_y_pred_true(y_pred_1d, y_true_1d)
@@ -41,6 +56,8 @@ def test_plot_cm(cm):
 
 
 if __name__ == "__main__":
-    test_get_ece(y_pred, y_conf, y_1)
-    test_cm(verbatim=True)
+    test_get_y_conf_true()
+    test_get_y_pred_true()
+    # test_get_ece(y_pred, y_conf, y_1)
+    # test_cm(verbatim=True)
 
