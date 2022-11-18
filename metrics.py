@@ -16,44 +16,51 @@ def get_ece(ce, y_true):
 
 def get_ce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor):
     """
-    Bucketize y_conf_1d
-    :param b_by_conf:
-    :param y_conf_true: 1d confidence tensor for true labels
-    :param y_pred_true: 1d binary prediction tensor for true labels
-    :return: [(CE/bucket, n/bucket)]
+
+    :param b_by_conf: list of bucket indices per confidence score.
+    :param y_conf_true: 1d vec of confidence scores for true labels only
+    :param y_pred_true: 1d vec of binary prediction for true labels only
+    :return: [(CE per bucket, size of bucket)]
     """
     ce = [get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true) for b in range(c.n_class)]
     return ce
 
 
-def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, cm: torch.Tensor) -> torch.Tensor:
-    y_pred, y_true = torch.argmax(y_pred, dim=1), torch.argmax(y_true, dim=1)
+def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
+    """
+
+    :param b: current bucket to evaluate
+    :param b_by_conf: list of bucket indices per confidence score.
+    :param y_conf_true: 1d vec of confidence scores for true labels only
+    :param y_pred_true: 1d vec of binary prediction for true labels only
+    :return: (CE per bucket, size of bucket)
+    """
+    indices_b = (b_by_conf == b).int()
+    n = sum(indices_b)
+    if n == 0:
+        return torch.tensor(0), torch.tensor(1)
+    y_conf_b = torch.sum(torch.mul(y_conf_true, indices_b))
+    y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
+    out = torch.abs(y_pred_b - y_conf_b) / n
+    return out, n
+
+
+def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, cm_last: torch.Tensor) -> torch.Tensor:
+    cm = cm_last.clone().detach().requires_grad_(False)
     for true_i, pred_i in zip(y_true, y_pred):
         cm[true_i][pred_i] += 1
     return cm
 
 
-def init_confusion_matrix(y_true: torch.Tensor) -> torch.Tensor:
-    n_class = len(y_true[0])
-    cm = torch.zeros(n_class, n_class).int()
+def init_confusion_matrix() -> torch.Tensor:
+    cm = torch.zeros(c.n_class, c.n_class).int()
     return cm
-
-
-def get_ce_per_bucket(b: int, b_by_conf, y_conf_true, y_pred_true):
-    indices_b = (b_by_conf == b).int()
-    n = sum(indices_b)
-    if n == 0:
-        return 0, 1
-    y_conf_b = torch.sum(torch.mul(y_conf_true, indices_b))
-    y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
-    out = torch.abs(y_pred_b - y_conf_b) / n
-    return out, torch.tensor(n)
 
 
 def get_y_conf_true(y_conf_2d, y_true_1d):
     """
 
-    :param y_conf_2d: shape (batch_size, n_class)
+    :param y_conf_2d: shape (actual_batch_size, n_class)
     :param y_true_1d: 1d true labels
     :return: 1d vec of confidence score for true labels only
     """

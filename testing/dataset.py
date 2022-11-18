@@ -1,6 +1,5 @@
 import torch
 import torchvision
-import torch.nn.functional as F
 import config as c
 
 
@@ -18,8 +17,7 @@ def get_MNIST_test_set():
                                      (0.1307,), (0.3081,)),
                                  ]),
                                  target_transform=torchvision.transforms.Compose([
-                                     lambda x: torch.tensor(x),
-                                     lambda x: F.one_hot(x, 10)]),
+                                     lambda x: torch.tensor(x), ]),
                                  ),
       batch_size=c.batch_size_test, shuffle=True)
     return test_loader

@@ -19,7 +19,7 @@ class Model(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
-        logits = F.log_softmax(x)
+        logits = F.log_softmax(x, dim=1)
 
         return logits
 

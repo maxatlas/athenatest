@@ -1,9 +1,9 @@
 import os
 import config as c
 import torch
-import shutil
 
 from pathlib import Path
+from metrics import get_y_pred_true
 
 
 def init_folders(session_id):
@@ -46,4 +46,10 @@ def get_session_id(raw_model_ids: str, dataset_id: str):
     """
     session_id = "%s%s%s" % (raw_model_ids, c.delimiter, dataset_id)
     return session_id
+
+
+def get_FP_samples(X, y_pred_1d, y_true_1d, save_path):
+    correct_ids = get_y_pred_true(y_pred_1d, y_true_1d)
+    samples = X[correct_ids, :]
+
 
