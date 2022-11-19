@@ -47,7 +47,7 @@ def load_model(model: str, n_class: int):
     return model
 
 
-def get_MNIST_test_set(folder_path: Path, pad: int):
+def get_test_set(folder_path: Path, pad: int):
     """
 
     :param folder_path: string
