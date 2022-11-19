@@ -8,7 +8,9 @@ _, y_2, _, _ = tester.next()
 
 
 def test_get_y_conf_1d():
-    y_conf_2d = torch.tensor([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+    y_conf_2d = torch.tensor([[0.2, 0.8],
+                              [0.6, 0.4],
+                              [0.1, 0.9]])
     y_pred_1d = torch.argmax(y_conf_2d, dim=1)
     out = get_y_conf_1d(y_conf_2d, y_pred_1d).tolist()
     out = [round(i, 1) for i in out]
@@ -16,7 +18,9 @@ def test_get_y_conf_1d():
 
 
 def test_get_y_pred_true():
-    y_conf_2d = torch.tensor([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+    y_conf_2d = torch.tensor([[0.2, 0.8],
+                              [0.6, 0.4],
+                              [0.1, 0.9]])
     y_true_1d = torch.tensor([0, 1, 1])
     y_pred_1d = torch.argmax(y_conf_2d, dim=1)
     out = get_y_pred_true(y_pred_1d, y_true_1d).tolist()
@@ -60,6 +64,7 @@ def test_cm():
     assert cm.tolist() == [[2, 2, 1],
                            [0, 2, 1],
                            [1, 0, 1]]
+
     cm = get_confusion_matrix(y_pred, y_pred, n_class=class_size)
     assert cm.tolist() == [[3, 0, 0],
                            [0, 4, 0],
