@@ -56,7 +56,8 @@ def test_get_ece():
     assert round(float(ece), 3) == 0.192, "wrong ece"
     assert round(float(mce), 3) == 0.390, "wrong mce"
 
-    return mce, ece
+    ce = torch.tensor([])
+    get_ece(ce)
 
 
 def test_cm():
@@ -112,8 +113,6 @@ def test_agg_ce():
     plot_ce(ce_1, batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
     plot_ce(ce_1, batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
 
-    ce = torch.abs(ce)
-    ce_agg = torch.abs(ce_agg)
     ece = get_ece(ce, b1+b2)
     ece_agg = get_ece(ce_agg, b1+b2)
 
@@ -123,8 +122,8 @@ def test_agg_ce():
 
 if __name__ == "__main__":
     test_agg_ce()
-    test_get_y_conf_1d()
-    test_get_y_pred_true()
-    test_cm()
-    test_get_ece()
+    # test_get_y_conf_1d()
+    # test_get_y_pred_true()
+    # test_cm()
+    # test_get_ece()
 

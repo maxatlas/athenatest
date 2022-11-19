@@ -1,12 +1,13 @@
 import argparse
+import warnings
 import config as c
 import torch
 from pathlib import Path
 from utils import (init_folders, batch_eval,
                    load_model, get_test_set, get_dataloader)
 from metrics import (get_ce, get_ce_b, get_mce, get_ece, plot_ce,
-                     get_confusion_matrix, plot_confusion_matrix,
-                     init_confusion_matrix)
+                     get_confusion_matrix, plot_confusion_matrix, init_confusion_matrix,
+                     get_accuracy)
 from improve_fp import save_FP_samples
 
 
@@ -27,20 +28,17 @@ parser.add_argument("--save_fp",
                     "-s",
                     type=bool,
                     default=False)
-parser.add_argument('--dev_thresh',
+parser.add_argument('--acc_thresh',
                     '-t',
                     type=float,
-                    default=c.deviation_threshold,
-                    help="Deviation threshold from benchmark results before termination.")
+                    default=c.accuracy_threshold,
+                    help="Accuracy threshold for early stopping. ")
 args = parser.parse_args()
 
 model_i, data_path = args.model, args.data
-
-device, save_fp, dev_thresh = args.device, args.save_fp, args.dev_thresh
+device, save_fp, acc_thresh = args.device, args.save_fp, args.acc_thresh
 
 init_folders()
-print("Folders created.")
-
 
 """Load models and dataset per identifiers"""
 test_loader = get_dataloader(get_test_set(c.data_folder_path, pad=2))
@@ -50,7 +48,7 @@ print("\nDataset loaded from %s." % data_path)
 model = load_model(model_i, n_class).to(device)
 print("\nConvNext %s loaded." % model_i)
 
-bin_size = torch.tensor(c.k).to(device)
+bin_size, acc_thresh = torch.tensor(c.k).to(device), torch.tensor(acc_thresh).to(device)
 
 """Evaluate model"""
 eval_res = {}
@@ -58,6 +56,13 @@ ce, mce, cm = torch.zeros(c.k), -1, init_confusion_matrix(n_class)
 for batch_id, (X, y) in enumerate(test_loader):
     X, y = X.to(device), y.to(device)
     y_pred, y_conf = batch_eval(model, X)
+
+    # early stopping
+    acc = get_accuracy(y_pred, y)
+    if acc < acc_thresh:
+        warnings.warn("WARNING: Model accuracy below set threshold. Terminating evaluation now...")
+        break
+
     # get list of CE value and bucket_size pair
     ce_b = get_ce_b(y_pred, y_conf, y, bin_size)
     # get current MCE value
@@ -73,7 +78,6 @@ for batch_id, (X, y) in enumerate(test_loader):
                                      save_path=c.fp_folder_path)
 
 ece = get_ece(ce, batch_size=dataset_size)
-
 
 """Store results to no/sql database/ whatever logging system in place."""
 plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")

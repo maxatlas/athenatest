@@ -20,10 +20,10 @@ def get_ece(ce, batch_size: int):
 def get_ce(ce_b, absolute=False):
     """
 
-    :param ce_b: torch.tensor(([+/-CE/bucket, size of bucket]))
+    :param ce_b: torch.tensor([+/-CE per bucket, size of bucket])
     :param absolute: return the absolute tensor if true, for ece/mce calculation;
-                     change nothing if false, for aggregation.
-    :return: torch.tensor([un-absolute CE per bucket * size of bucket])
+                     change nothing if false, for CE aggregation over batches.
+    :return: torch.tensor([CE per bucket * size of bucket])
     """
     ce = torch.tensor([torch.mul(*pair) for pair in ce_b])
     ce = torch.abs(ce) if absolute else ce
@@ -68,15 +68,15 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     :return: (un-absolute CE per bucket, size of bucket)
     """
     indices_b = (b_by_conf == b).int()
-    n = sum(indices_b)
-    if n == 0:
-        return torch.tensor(0), torch.tensor(1)
+    bucket_size = sum(indices_b)
+    if bucket_size == 0:
+        return torch.tensor(torch.nan), torch.tensor(1)
     # sum of predicted confidence under bucket b
     y_conf_b = torch.sum(torch.mul(y_conf_1d, indices_b))
     # number of correctly predicted samples under bucket b
     y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
-    out = (y_pred_b - y_conf_b) / n
-    return out, n
+    ce_per_b = (y_pred_b - y_conf_b) / bucket_size
+    return ce_per_b, bucket_size
 
 
 def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, n_class: int, cm_last: torch.Tensor = None) -> \
@@ -93,7 +93,8 @@ def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, n_class: in
     assert y_true.dim() == 1
     assert y_pred.dim() == 1
 
-    if cm_last is None: cm_last = init_confusion_matrix(n_class)
+    if cm_last is None:
+        cm_last = init_confusion_matrix(n_class)
     y_true = y_true.int()
     y_pred = y_pred.int()
     cm = cm_last.clone().detach().requires_grad_(False)
@@ -123,19 +124,26 @@ def get_y_conf_1d(y_conf_2d: torch.Tensor, y_pred_1d: torch.Tensor) -> torch.Ten
     return out
 
 
-def get_y_pred_true(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
+def get_y_pred_true(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tensor:
     """
 
     :param y_pred_1d: 1d vectors of length batch_size.
     :param y_true_1d: 1d true labels
     :return: 1d vec of predicted accuracy for true labels only
     """
-    assert y_pred_1d.dim() == 1
-    assert y_true_1d.dim() == 1
     assert y_pred_1d.shape == y_true_1d.shape
+    assert y_true_1d.dim() == 1
 
     out = y_pred_1d.eq(y_true_1d).int().flatten()
     return out
+
+
+def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tensor:
+    assert y_pred_1d.shape == y_true_1d.shape
+    assert y_pred_1d.dim() == 1
+
+    acc = sum(y_pred_1d.eq(y_true_1d))/len(y_pred_1d)
+    return acc
 
 
 def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
@@ -165,4 +173,3 @@ def plot_confusion_matrix(cm: torch.Tensor, save_path: Path, cmap=plt.cm.gray_r)
     plt.savefig(str(save_path))
 
     plt.clf()
-
