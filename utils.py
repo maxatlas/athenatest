@@ -1,11 +1,15 @@
 import os
 import config as c
 import torch
-
 from pathlib import Path
-from metrics import get_y_pred_true
+from PIL import Image
 
-from torchvision.utils import save_image
+# for dataset loading and saving
+from torchvision import transforms, datasets
+from torch.utils.data import DataLoader
+
+
+torch.manual_seed(c.random_seed)
 
 
 def init_folders(session_id):
@@ -20,22 +24,38 @@ def init_folders(session_id):
         os.makedirs(session_id/Path(folder), exist_ok=True)
 
 
-def load_model(model_id: str):
+def load_model(model: str):
     """
-    This is a pseudo function that should return model based on some database lookup or API communication.
-    :param model_id: string
+
+    :param model: string
     :return:
     """
     return
 
 
-def load_dataset(dataset_id: str):
+def load_dataset(folder_path: str):
     """
-    This is a pseudo function that should return dataset based on some database lookup or API communication.
-    :param dataset_id: string
+
+    :param folder_path: string
     :return:
     """
-    return
+    dataset = datasets.ImageFolder(folder_path, transform=transforms.Compose([
+        transforms.Grayscale(),
+        transforms.ToTensor(),
+    ]),
+                                   target_transform=transforms.Compose([
+                                       lambda x: torch.tensor(x), ]),
+                                   )
+    dataset = DataLoader(dataset, batch_size=c.batch_size_test, shuffle=c.shuffle_dataloader)
+
+    return dataset
+
+
+def load_img(img_path: str):
+    img_path = Path(img_path)
+    img = Image.open(img_path)
+    converter = transforms.ToTensor()
+    return converter(img)
 
 
 def get_session_id(raw_model_ids: str, dataset_id: str):
@@ -50,16 +70,8 @@ def get_session_id(raw_model_ids: str, dataset_id: str):
     return session_id
 
 
-def get_FP_samples(X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
-    correct_ids = get_y_pred_true(y_pred_1d, y_true_1d).bool().nonzero().flatten()
-    samples = X[correct_ids, :]
-    return samples
+def get_boundaries(bin_size: int = c.k):
+    return torch.arange(0, 1.01, 1 / bin_size)
 
-
-def save_FP_samples(samples: torch.Tensor, save_path: str):
-    save_path = Path(save_path) if type(save_path) is not Path else save_path
-    for i, sample in enumerate(samples):
-        save_image(sample, save_path/("%i.png" % i))
-        torch.save(sample, save_path/("%i.tensor" % i))
 
 

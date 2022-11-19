@@ -21,3 +21,6 @@ n_class = 10
 random_seed = 1
 
 k = 10
+data_folder = "data/MNIST/test"
+shuffle_dataloader = True
+
