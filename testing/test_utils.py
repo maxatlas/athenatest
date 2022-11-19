@@ -4,11 +4,11 @@ import config as c
 
 
 def test_load_dataset():
-    ds = load_dataset(".."/Path(c.data_folder))
-    dl = enumerate(ds)
+    ds = get_MNIST_test_set(".."/Path(c.data_folder_path))
+    dl = enumerate(get_dataloader(ds))
     i, (X, y) = next(dl)
     assert i == 0
-    assert X.shape == (100, 1, 28, 28)
+    assert X.shape == (100, 3, 28, 28)
     assert y.shape[0] == 100
 
 

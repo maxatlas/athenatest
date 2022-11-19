@@ -32,13 +32,13 @@ def load_model(model: str):
     return
 
 
-def get_MNIST_test_set(folder_path: str):
+def get_MNIST_test_set(folder_path: Path):
     """
 
     :param folder_path: string
     :return:
     """
-    dataset = datasets.ImageFolder(folder_path, transform=transforms.Compose([
+    dataset = datasets.ImageFolder(str(folder_path), transform=transforms.Compose([
         transforms.ToTensor(),
     ]),
                                    target_transform=transforms.Compose([
@@ -57,18 +57,6 @@ def load_img(img_path: str):
     img = Image.open(img_path)
     converter = transforms.ToTensor()
     return converter(img)
-
-
-def get_session_id(raw_model_ids: str, dataset_id: str):
-    """
-    Get session id by hashing the concatenated string of raw_model_ids
-    Calculate timestamp if not given.
-    :param raw_model_ids:
-    :param dataset_id:
-    :return:
-    """
-    session_id = "%s%s%s" % (raw_model_ids, c.delimiter, dataset_id)
-    return session_id
 
 
 def get_boundaries(bin_size: int = c.k):

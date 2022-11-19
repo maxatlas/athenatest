@@ -16,10 +16,8 @@ def test_get_FP_samples():
 
 
 def test_save_FP_samples():
-    for i in range(c.n_class):
-        fp_X, fp_y = get_FP_samples_per_class(i, X, y_pred_1d=y_pred, y_true_1d=y_1)
-        save_FP_samples(fp_X, fp_y, "../results/false_positives"), \
-            "wrong operation for save_FP_samples"
+    save_FP_samples(0, range(10), X[:3], y_pred[:3], y_1[:3], "../results/false_positives"), \
+        "wrong operation for save_FP_samples"
 
 
 if __name__ == "__main__":
