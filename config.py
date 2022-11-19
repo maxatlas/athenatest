@@ -16,7 +16,6 @@ ece_table_name = "ECE"
 cm_table_name = "confusion_matrix"
 
 batch_size_test = 100
-n_class = 10
 
 random_seed = 122
 
@@ -25,6 +24,6 @@ data_folder_path = "../data/MNIST/test"
 test_output_folder = "vis/"
 shuffle_dataloader = True
 
-metrics_round_to = 3
+pad = 2
 decimal_precision = 5
 

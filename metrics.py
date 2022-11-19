@@ -102,7 +102,7 @@ def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, n_class: in
     return cm
 
 
-def init_confusion_matrix(n_class: int = c.n_class) -> torch.Tensor:
+def init_confusion_matrix(n_class: int) -> torch.Tensor:
     cm = torch.zeros(n_class, n_class).int()
     return cm
 

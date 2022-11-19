@@ -8,8 +8,8 @@ MNIST_path = "../%s" % c.data_folder_path
 class Tester:
     def __init__(self, model="tiny", data_path=MNIST_path, batch_size: int = c.batch_size_test,
                  shuffle: bool = c.shuffle_dataloader):
-        self.model = load_model(model)
-        data = get_dataloader(get_MNIST_test_set(data_path), batch_size=batch_size, shuffle=shuffle)
+        data = get_dataloader(get_MNIST_test_set(data_path, pad=c.pad), batch_size=batch_size, shuffle=shuffle)
+        self.model = load_model(model, len(data.dataset.classes))
         self.data = enumerate(data)
 
     def next(self):

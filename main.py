@@ -37,7 +37,7 @@ print("Folders created.")
 
 
 """Load models and dataset per identifiers"""
-test_loader = get_dataloader(get_MNIST_test_set(c.data_folder_path))
+test_loader = get_dataloader(get_MNIST_test_set(c.data_folder_path, pad=2))
 n_class = len(test_loader.dataset.classes)
 dataset_size = len(test_loader.dataset)
 print("\nDataset %s loaded." % "MNIST")

@@ -4,7 +4,7 @@ import config as c
 
 
 def test_load_dataset():
-    ds = get_MNIST_test_set(".."/Path(c.data_folder_path))
+    ds = get_MNIST_test_set(".."/Path(c.data_folder_path), pad=c.pad)
     dl = enumerate(get_dataloader(ds))
     i, (X, y) = next(dl)
     assert i == 0

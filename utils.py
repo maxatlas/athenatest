@@ -23,7 +23,7 @@ def init_folders():
         os.makedirs(Path(folder), exist_ok=True)
 
 
-def load_model(model: str, n_class: int = c.n_class):
+def load_model(model: str, n_class: int):
     """
     :param model: string
     :param n_class: int
@@ -47,14 +47,15 @@ def load_model(model: str, n_class: int = c.n_class):
     return model
 
 
-def get_MNIST_test_set(folder_path: Path):
+def get_MNIST_test_set(folder_path: Path, pad: int):
     """
 
     :param folder_path: string
+    :param pad: int
     :return:
     """
     dataset = datasets.ImageFolder(str(folder_path), transform=transforms.Compose([
-        transforms.Pad(2),
+        transforms.Pad(pad),
         transforms.ToTensor(),
     ]),
                                    target_transform=transforms.Compose([
