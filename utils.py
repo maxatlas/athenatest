@@ -23,13 +23,28 @@ def init_folders():
         os.makedirs(Path(folder), exist_ok=True)
 
 
-def load_model(model: str):
+def load_model(model: str, n_class: int = c.n_class):
     """
-
     :param model: string
+    :param n_class: int
     :return:
     """
-    return
+    if model == "tiny":
+        from torchvision.models import convnext_tiny
+        model = convnext_tiny
+    elif model == "small":
+        from torchvision.models import convnext_small
+        model = convnext_small
+    elif model == "base":
+        from torchvision.models import convnext_base
+        model = convnext_base
+    elif model == "large":
+        from torchvision.models import convnext_large
+        model = convnext_large
+    else:
+        raise ValueError("Model indicator not supported.")
+    model = model(num_classes=n_class)
+    return model
 
 
 def get_MNIST_test_set(folder_path: Path):
@@ -39,6 +54,7 @@ def get_MNIST_test_set(folder_path: Path):
     :return:
     """
     dataset = datasets.ImageFolder(str(folder_path), transform=transforms.Compose([
+        transforms.Pad(2),
         transforms.ToTensor(),
     ]),
                                    target_transform=transforms.Compose([

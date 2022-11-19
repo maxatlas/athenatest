@@ -145,7 +145,7 @@ def plot_ce(ce, save_path: Path, bin_size: int = c.k, batch_size: int = c.batch_
     boundaries = get_boundaries(bin_size)
     ce = [float(ce_per_b) for ce_per_b in ce]
     plt.bar(boundaries[1:]-1/(2*bin_size), ce, width=1/bin_size)
-    plt.title("Calibrated Error over %i Bins" % bin_size)
+    plt.title("Calibration Error over %i Bins" % bin_size)
     plt.xticks(boundaries)
     plt.savefig(str(save_path))
 
