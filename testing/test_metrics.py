@@ -4,7 +4,7 @@ from metrics import *
 
 tester = Tester()
 _, y_1, y_pred, y_conf = tester.next()
-_, y_2, _, _ = tester.next()
+_, y_2, y_pred_2, y_conf_2 = tester.next()
 
 
 def test_get_y_conf_1d():
@@ -45,7 +45,12 @@ def test_get_ece():
         [0.12, 0.09, 0.02, 0.17, 0.60],
     ])
 
-    ece, mce, ce = get_ece_mce_ce(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
+    batch_size = len(y_pred_1d)
+    ce = get_ce(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
+    ce = torch.abs(ce)
+
+    ece = get_ece(ce, batch_size=batch_size)
+    mce = get_mce(ce)
 
     plot_ce(ce, save_path="%s/ce.png" % c.test_output_folder, bin_size=bin_size)
 
@@ -84,7 +89,28 @@ def test_plot_cm(cm, file_name: str = "cm"):
     plot_confusion_matrix(cm, "%s/%s.png" % (c.test_output_folder, file_name))
 
 
+def test_agg_ce():
+    tester_100 = Tester(batch_size=100)
+    _, y_true_100_1, y_pred_100_1, y_conf_100_1 = tester_100.next()
+    _, y_true_100_2, y_pred_100_2, y_conf_100_2 = tester_100.next()
+    y_true_200 = torch.concat([y_true_100_1, y_true_100_2], dim=0)
+    y_pred_200 = torch.concat([y_pred_100_1, y_pred_100_2], dim=0)
+    y_conf_200 = torch.concat([y_conf_100_1, y_conf_100_2], dim=0)
+
+    ce200 = get_ce(y_pred_200, y_conf_200, y_true_200)
+    ce100_1 = get_ce(y_pred_100_1, y_conf_100_1, y_true_100_1)
+    ce100_2 = get_ce(y_pred_100_2, y_conf_100_2, y_true_100_2)
+
+    ce200 = torch.tensor([torch.mul(*pair) for pair in ce200])
+    ce100_1 = torch.tensor([torch.mul(*pair) for pair in ce100_1])
+    ce100_2 = torch.tensor([torch.mul(*pair) for pair in ce100_2])
+    ce100_agg = (ce100_1 + ce100_2)
+
+    assert all(torch.isclose(ce200, ce100_agg))
+
+
 if __name__ == "__main__":
+    test_agg_ce()
     test_get_y_conf_1d()
     test_get_y_pred_true()
     test_cm()

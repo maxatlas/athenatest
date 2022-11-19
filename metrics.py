@@ -5,15 +5,27 @@ import config as c
 from utils import get_boundaries
 
 
-def get_ece_mce_ce(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor, bin_size: int = c.k) -> \
-        tuple[float, float, list]:
+def get_mce(ce):
+    mce = max([torch.abs(ce_by_b[0]) for ce_by_b in ce])
+    return mce
+
+
+def get_ece(ce, batch_size: int):
+    # CE per bucket * size of bucket
+    # sum the absolute of product
+    ece = sum([torch.abs(torch.mul(*ce_by_b)) for ce_by_b in ce]) / batch_size
+    return ece
+
+
+def get_ce(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor, bin_size: int = c.k) -> \
+        torch.Tensor:
     """
 
     :param y_pred_1d: 1d vec of predicted labels
     :param y_conf_2d: 2d vec of confidence score of shape (batch_size, n_class)
     :param y_true_1d: 1d vec of true labels
     :param bin_size: used to generate boundaries.
-    :return:
+    :return: torch.tensor([(un-absolute CE per bucket, size of bucket)])
     """
     assert y_pred_1d.dim() == 1
     assert y_conf_2d.dim() == 2
@@ -23,42 +35,15 @@ def get_ece_mce_ce(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: 
 
     y_pred_true = get_y_pred_true(y_pred_1d, y_true_1d)
     y_conf_1d = get_y_conf_1d(y_conf_2d, y_pred_1d)
-    batch_size = len(y_pred_true)
 
     boundaries = get_boundaries(bin_size)
     b_by_conf = torch.bucketize(y_conf_1d, boundaries) - 1
-    ce = get_ce(b_by_conf, y_conf_1d, y_pred_true, bin_size=bin_size)
 
-    mce = get_mce(ce)
-    ece = get_ece(ce, batch_size=batch_size)
+    ce = [get_ce_per_bucket(b, b_by_conf, y_conf_1d, y_pred_true) for b in range(bin_size)]
+    ce = torch.tensor(ce)
 
-    ece, mce = round(float(ece), c.metrics_round_to),\
-               round(float(mce), c.metrics_round_to),
-
-    return ece, mce, ce
-
-
-def get_mce(ce):
-    mce = max([ce_by_b[0] for ce_by_b in ce])
-    return mce
-
-
-def get_ece(ce, batch_size: int):
-    ece = sum([torch.mul(*ce_by_b) for ce_by_b in ce]) / batch_size
-    return ece
-
-
-def get_ce(b_by_conf, y_conf_true: torch.Tensor, y_pred_true: torch.Tensor, bin_size: int = c.k) -> list:
-    """
-
-    :param b_by_conf: list of bucket indices per confidence score.
-    :param y_conf_true: 1d vec of confidence scores for true labels only
-    :param y_pred_true: 1d vec of binary prediction for true labels only
-    :param bin_size: bin size
-    :return: [(CE per bucket, size of bucket)]
-    """
-    ce = [get_ce_per_bucket(b, b_by_conf, y_conf_true, y_pred_true) for b in range(bin_size)]
     return ce
+
 
 
 def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.Tensor, torch.Tensor]:
@@ -68,7 +53,7 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     :param b_by_conf: list of bucket indices per confidence score.
     :param y_conf_1d: 1d vec of confidence scores for predicted labels only
     :param y_pred_true: 1d vec of binary prediction for true labels only
-    :return: (CE per bucket, size of bucket)
+    :return: (un-absolute CE per bucket, size of bucket)
     """
     indices_b = (b_by_conf == b).int()
     n = sum(indices_b)
@@ -78,7 +63,7 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     y_conf_b = torch.sum(torch.mul(y_conf_1d, indices_b))
     # number of correctly predicted samples under bucket b
     y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
-    out = torch.abs(y_pred_b - y_conf_b) / n
+    out = (y_pred_b - y_conf_b) / n
     return out, n
 
 

@@ -2,7 +2,7 @@ import argparse
 import config as c
 
 from utils import (init_folders,
-                   load_model, load_dataset,
+                   load_model, get_MNIST_test_set, get_dataloader,
                    get_session_id)
 from metrics import (get_mce, get_ece, get_confusion_matrix, plot_ce, plot_confusion_matrix,)
 
@@ -50,7 +50,7 @@ print("Folders created.")
 """Load models and dataset per identifiers"""
 model = load_model(model_id)
 print("\nModel %s loaded." % model_id)
-test_loader = load_dataset(dataset_id)
+test_loader = get_dataloader(get_MNIST_test_set(c.data_folder))
 print("\nDataset %s loaded." % dataset_id)
 
 

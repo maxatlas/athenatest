@@ -33,7 +33,7 @@ def load_model(model: str):
     return
 
 
-def load_dataset(folder_path: str):
+def get_MNIST_test_set(folder_path: str):
     """
 
     :param folder_path: string
@@ -46,8 +46,11 @@ def load_dataset(folder_path: str):
                                    target_transform=transforms.Compose([
                                        lambda x: torch.tensor(x), ]),
                                    )
-    dataset = DataLoader(dataset, batch_size=c.batch_size_test, shuffle=c.shuffle_dataloader)
+    return dataset
 
+
+def get_dataloader(dataset, batch_size: int = c.batch_size_test, shuffle: bool = c.shuffle_dataloader):
+    dataset = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataset
 
 
