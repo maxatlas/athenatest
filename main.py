@@ -20,6 +20,9 @@ parser.add_argument('--model',
                     '-m',
                     type=str,
                     default="tiny")
+parser.add_argument('--device',
+                    type=str,
+                    default="cpu")
 parser.add_argument('--dev_thresh',
                     '-t',
                     type=float,
@@ -30,7 +33,7 @@ args = parser.parse_args()
 
 model, data_path = args.model, args.data
 
-dev_thresh = args.dev_thresh
+device, dev_thresh = args.device, args.dev_thresh
 
 init_folders()
 print("Folders created.")
@@ -41,17 +44,19 @@ test_loader = get_dataloader(get_MNIST_test_set(c.data_folder_path, pad=2))
 n_class = len(test_loader.dataset.classes)
 dataset_size = len(test_loader.dataset)
 print("\nDataset %s loaded." % "MNIST")
-model = load_model(model, n_class)
+model = load_model(model, n_class).to(device)
 print("\nModel %s loaded." % "")
 
+bin_size = torch.tensor(c.k).to(device)
 
 """Evaluate model"""
 eval_res = {}
 ce, mce, cm = torch.zeros(c.k), -1, init_confusion_matrix(n_class)
 for batch_id, (X, y) in enumerate(test_loader):
+    X, y = X.to(device), y.to(device)
     y_pred, y_conf = batch_eval(model, X)
     # get list of CE value and bucket_size pair
-    ce_b = get_ce_b(y_pred, y_conf, y, c.k)
+    ce_b = get_ce_b(y_pred, y_conf, y, bin_size)
     # get current MCE value
     mce_cur = get_mce(ce_b)
     mce = mce_cur if mce_cur > mce else mce
@@ -64,12 +69,11 @@ for batch_id, (X, y) in enumerate(test_loader):
                                  y_pred_1d=y_pred, y_true_1d=y,
                                  save_path=c.fp_folder_path)
 
-ce = torch.abs(ce)
 ece = get_ece(ce, batch_size=dataset_size)
 
 
 """Store results to no/sql database/ whatever logging system in place."""
-plot_ce(ce, batch_size=dataset_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
+plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
 plot_confusion_matrix(cm, Path(c.res_folder_path)/"confusion_matrix.png")
 
 

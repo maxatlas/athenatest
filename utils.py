@@ -76,8 +76,8 @@ def load_img(img_path: str):
     return converter(img)
 
 
-def get_boundaries(bin_size: int = c.k):
-    return torch.arange(0, 1.01, 1 / bin_size)
+def get_boundaries(bin_size: torch.Tensor = c.k):
+    return torch.arange(0, 1.01, 1 / bin_size).to(bin_size.device)
 
 
 def batch_eval(model, x):

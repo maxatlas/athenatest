@@ -7,15 +7,13 @@ from torchvision.utils import save_image
 
 
 def save_FP_samples(batch_i: int, classes, X, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor, save_path: str = ""):
-    for label in classes:
-        label = int(label)
-        X_c, y_c = get_FP_samples_per_class(label, X, y_pred_1d, y_true_1d)
+    for i, label in enumerate(classes):
+        X_c, y_c = get_FP_samples_per_class(torch.tensor(i).to(X.device), X, y_pred_1d, y_true_1d)
         save_path = Path(save_path)
         if X_c.shape[0] > 0:
-            for i in range(len(X_c)):
-                label = str(y_c[i].tolist()[0])
+            for j in range(len(X_c)):
                 os.makedirs(save_path / label, exist_ok=True)
-                save_image(X_c[i], save_path / label / ("%i%i.png" % (batch_i, i)))
+                save_image(X_c[j], save_path / label / ("%i%i.png" % (batch_i, j)))
 
 
 def get_FP_samples_per_class(class_i: int, X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):

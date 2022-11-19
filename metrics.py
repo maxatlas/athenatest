@@ -13,7 +13,7 @@ def get_mce(ce_b):
 def get_ece(ce, batch_size: int):
     # CE per bucket * size of bucket
     # sum the absolute of product
-    ece = sum(ce) / batch_size
+    ece = sum(torch.abs(ce)) / batch_size
     return ece
 
 
@@ -142,8 +142,8 @@ def plot_ce(ce, save_path: Path, bin_size: int = c.k, batch_size: int = c.batch_
     assert len(ce) == bin_size
     ce = torch.abs(ce) / batch_size
 
+    bin_size = bin_size.to("cpu")
     boundaries = get_boundaries(bin_size)
-    ce = [float(ce_per_b) for ce_per_b in ce]
     plt.bar(boundaries[1:]-1/(2*bin_size), ce, width=1/bin_size)
     plt.title("Calibration Error over %i Bins" % bin_size)
     plt.xticks(boundaries)
