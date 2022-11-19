@@ -14,7 +14,7 @@ def test_get_y_conf_1d():
     y_pred_1d = torch.argmax(y_conf_2d, dim=1)
     out = get_y_conf_1d(y_conf_2d, y_pred_1d).tolist()
     out = [round(i, 1) for i in out]
-    assert out == [0.8, 0.6, 0.9]
+    assert out == [0.8, 0.6, 0.9], "wrong output for metrics.get_y_conf_1d()"
 
 
 def test_get_y_pred_true():
@@ -24,7 +24,7 @@ def test_get_y_pred_true():
     y_true_1d = torch.tensor([0, 1, 1])
     y_pred_1d = torch.argmax(y_conf_2d, dim=1)
     out = get_y_pred_true(y_pred_1d, y_true_1d).tolist()
-    assert out == [0, 0, 1]
+    assert out == [0, 0, 1], "wrong output for metrics.get_y_pred_true()"
 
 
 def test_get_ece():
@@ -47,10 +47,10 @@ def test_get_ece():
 
     ece, mce, ce = get_ece_mce_ce(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
 
-    plot_ce(ce, save_path="../vis/ce.png", bin_size=bin_size)
+    plot_ce(ce, save_path="%s/ce.png" % c.test_output_folder, bin_size=bin_size)
 
-    assert round(float(ece), 3) == 0.192
-    assert round(float(mce), 3) == 0.390
+    assert round(float(ece), 3) == 0.192, "wrong ece"
+    assert round(float(mce), 3) == 0.390, "wrong mce"
 
     return mce, ece
 
@@ -63,22 +63,25 @@ def test_cm():
     cm = get_confusion_matrix(y_pred, y_true, n_class=class_size)
     assert cm.tolist() == [[2, 2, 1],
                            [0, 2, 1],
-                           [1, 0, 1]]
+                           [1, 0, 1]], "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_normal")
 
     cm = get_confusion_matrix(y_pred, y_pred, n_class=class_size)
     assert cm.tolist() == [[3, 0, 0],
                            [0, 4, 0],
-                           [0, 0, 3]]
+                           [0, 0, 3]], "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_all_correct")
 
     cm = get_confusion_matrix(torch.tensor([]), torch.tensor([]), n_class=class_size)
-    assert cm.tolist() == torch.zeros(class_size, class_size).int().tolist()
+    assert cm.tolist() == torch.zeros(class_size, class_size).int().tolist(), \
+        "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_empty")
 
-    test_plot_cm(cm)
     return
 
 
-def test_plot_cm(cm):
-    plot_confusion_matrix(cm, "../vis/cm.png", benchmark_session_id="model_v1+MNIST")
+def test_plot_cm(cm, file_name: str = "cm"):
+    plot_confusion_matrix(cm, "%s/%s.png" % (c.test_output_folder, file_name))
 
 
 if __name__ == "__main__":

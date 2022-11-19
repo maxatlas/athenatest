@@ -8,7 +8,7 @@ def test_load_dataset():
     dl = enumerate(ds)
     i, (X, y) = next(dl)
     assert i == 0
-    assert X.shape == (100, 3, 28, 28)
+    assert X.shape == (100, 1, 28, 28)
     assert y.shape[0] == 100
 
 

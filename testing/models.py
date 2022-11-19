@@ -20,7 +20,6 @@ class Model(nn.Module):
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
         logits = F.log_softmax(x, dim=1)
-
         return logits
 
     def batch_eval(self, x):
