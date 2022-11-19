@@ -12,8 +12,8 @@ def save_FP_samples(batch_i: int, classes, X, y_pred_1d: torch.Tensor, y_true_1d
         save_path = Path(save_path)
         if X_c.shape[0] > 0:
             for j in range(len(X_c)):
-                os.makedirs(save_path / label, exist_ok=True)
-                save_image(X_c[j], save_path / label / ("%i%i.png" % (batch_i, j)))
+                os.makedirs(save_path / str(label), exist_ok=True)
+                save_image(X_c[j], save_path / str(label) / ("%i%i.png" % (batch_i, j)))
 
 
 def get_FP_samples_per_class(class_i: int, X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):

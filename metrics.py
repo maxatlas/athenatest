@@ -30,8 +30,8 @@ def get_ce(ce_b, absolute=False):
     return ce
 
 
-def get_ce_b(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor, bin_size: int = c.k) -> \
-        torch.Tensor:
+def get_ce_b(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor,
+             bin_size: torch.Tensor = torch.tensor(c.k)) -> torch.Tensor:
     """
 
     :param y_pred_1d: 1d vec of predicted labels
@@ -138,7 +138,7 @@ def get_y_pred_true(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
     return out
 
 
-def plot_ce(ce, save_path: Path, bin_size: int = c.k, batch_size: int = c.batch_size_test):
+def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
     assert len(ce) == bin_size
     ce = torch.abs(ce) / batch_size
 
