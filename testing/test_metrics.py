@@ -27,7 +27,7 @@ def test_get_y_pred_true():
 
 
 def test_get_ece():
-    bin_size = 3
+    bin_size = torch.tensor(3)
 
     y_pred_1d = torch.tensor([0, 2, 2, 4, 0, 1, 1, 3, 3, 4])
     y_true_1d = torch.tensor([0, 2, 3, 4, 2, 0, 1, 3, 3, 2])
