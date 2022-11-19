@@ -1,7 +1,6 @@
 from Tester import Tester
 from metrics import *
 
-
 tester = Tester()
 _, y_1, y_pred, y_conf = tester.next()
 _, y_2, y_pred_2, y_conf_2 = tester.next()
@@ -46,13 +45,13 @@ def test_get_ece():
     ])
 
     batch_size = len(y_pred_1d)
-    ce = get_ce(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
-    ce = torch.abs(ce)
+    ce_b = get_ce_b(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
+    ce = get_ce(ce_b, absolute=True)
 
     ece = get_ece(ce, batch_size=batch_size)
-    mce = get_mce(ce)
+    mce = get_mce(ce_b)
 
-    plot_ce(ce, save_path="%s/ce.png" % c.test_output_folder, bin_size=bin_size)
+    plot_ce(ce, batch_size=batch_size, save_path=Path(c.test_output_folder)/"ce.png", bin_size=bin_size)
 
     assert round(float(ece), 3) == 0.192, "wrong ece"
     assert round(float(mce), 3) == 0.390, "wrong mce"
@@ -86,27 +85,40 @@ def test_cm():
 
 
 def test_plot_cm(cm, file_name: str = "cm"):
-    plot_confusion_matrix(cm, "%s/%s.png" % (c.test_output_folder, file_name))
+    plot_confusion_matrix(cm, Path(c.test_output_folder)/("%s.png" % file_name))
 
 
 def test_agg_ce():
-    tester_100 = Tester(batch_size=100)
-    _, y_true_100_1, y_pred_100_1, y_conf_100_1 = tester_100.next()
-    _, y_true_100_2, y_pred_100_2, y_conf_100_2 = tester_100.next()
-    y_true_200 = torch.concat([y_true_100_1, y_true_100_2], dim=0)
-    y_pred_200 = torch.concat([y_pred_100_1, y_pred_100_2], dim=0)
-    y_conf_200 = torch.concat([y_conf_100_1, y_conf_100_2], dim=0)
+    b1, b2 = 100, 19
+    b = b1 + b2
+    tester1 = Tester(batch_size=b1)
+    tester2 = Tester(batch_size=b2)
+    _, y_true_1, y_pred_1, y_conf_1 = tester1.next()
+    _, y_true_2, y_pred_2, y_conf_2 = tester2.next()
+    y_true = torch.concat([y_true_1, y_true_2], dim=0)
+    y_pred = torch.concat([y_pred_1, y_pred_2], dim=0)
+    y_conf = torch.concat([y_conf_1, y_conf_2], dim=0)
 
-    ce200 = get_ce(y_pred_200, y_conf_200, y_true_200)
-    ce100_1 = get_ce(y_pred_100_1, y_conf_100_1, y_true_100_1)
-    ce100_2 = get_ce(y_pred_100_2, y_conf_100_2, y_true_100_2)
+    ce = get_ce_b(y_pred, y_conf, y_true)
+    ce_1 = get_ce_b(y_pred_1, y_conf_1, y_true_1)
+    ce_2 = get_ce_b(y_pred_2, y_conf_2, y_true_2)
 
-    ce200 = torch.tensor([torch.mul(*pair) for pair in ce200])
-    ce100_1 = torch.tensor([torch.mul(*pair) for pair in ce100_1])
-    ce100_2 = torch.tensor([torch.mul(*pair) for pair in ce100_2])
-    ce100_agg = (ce100_1 + ce100_2)
+    ce = get_ce(ce)
+    ce_1 = get_ce(ce_1)
+    ce_2 = get_ce(ce_2)
+    ce_agg = (ce_1 + ce_2)
 
-    assert all(torch.isclose(ce200, ce100_agg))
+    plot_ce(ce, batch_size=b, save_path="%s/ce_MNIST_agg.png" % c.test_output_folder)
+    plot_ce(ce_1, batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
+    plot_ce(ce_1, batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
+
+    ce = torch.abs(ce)
+    ce_agg = torch.abs(ce_agg)
+    ece = get_ece(ce, b1+b2)
+    ece_agg = get_ece(ce_agg, b1+b2)
+
+    assert all(torch.isclose(ce, ce_agg))
+    assert ece.isclose(ece_agg)
 
 
 if __name__ == "__main__":

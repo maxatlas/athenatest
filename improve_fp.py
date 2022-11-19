@@ -6,7 +6,19 @@ from metrics import get_y_pred_true
 from torchvision.utils import save_image
 
 
-def get_FP_samples(class_i: int, X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
+def save_FP_samples(batch_i: int, classes, X, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor, save_path: str = ""):
+    for label in classes:
+        label = int(label)
+        X_c, y_c = get_FP_samples_per_class(label, X, y_pred_1d, y_true_1d)
+        save_path = Path(save_path)
+        if X_c.shape[0] > 0:
+            for i in range(len(X_c)):
+                label = str(y_c[i].tolist()[0])
+                os.makedirs(save_path / label, exist_ok=True)
+                save_image(X_c[i], save_path / label / ("%i%i.png" % (batch_i, i)))
+
+
+def get_FP_samples_per_class(class_i: int, X: torch.Tensor, y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
     """
     :param class_i:
     :param X:
@@ -27,16 +39,3 @@ def get_FP_samples(class_i: int, X: torch.Tensor, y_pred_1d: torch.Tensor, y_tru
     return samples, y_true
 
 
-def save_FP_samples(samples_X: torch.Tensor, samples_y: torch.Tensor, save_path: str):
-    """
-    :param samples_X:
-    :param samples_y:
-    :param save_path:
-    :return:
-    """
-    save_path = Path(save_path)
-    if samples_X.shape[0] > 0:
-        for i in range(len(samples_X)):
-            label = str(samples_y[i].tolist()[0])
-            os.makedirs(save_path/label, exist_ok=True)
-            save_image(samples_X[i], save_path/label/("%i.png" % i))

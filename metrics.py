@@ -1,23 +1,36 @@
 import torch
 import matplotlib.pyplot as plt
 import config as c
-
+from pathlib import Path
 from utils import get_boundaries
 
 
-def get_mce(ce):
-    mce = max([torch.abs(ce_by_b[0]) for ce_by_b in ce])
+def get_mce(ce_b):
+    mce = max([torch.abs(ce_by_b[0]) for ce_by_b in ce_b])
     return mce
 
 
 def get_ece(ce, batch_size: int):
     # CE per bucket * size of bucket
     # sum the absolute of product
-    ece = sum([torch.abs(torch.mul(*ce_by_b)) for ce_by_b in ce]) / batch_size
+    ece = sum(ce) / batch_size
     return ece
 
 
-def get_ce(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor, bin_size: int = c.k) -> \
+def get_ce(ce_b, absolute=False):
+    """
+
+    :param ce_b: torch.tensor(([+/-CE/bucket, size of bucket]))
+    :param absolute: return the absolute tensor if true, for ece/mce calculation;
+                     change nothing if false, for aggregation.
+    :return: torch.tensor([un-absolute CE per bucket * size of bucket])
+    """
+    ce = torch.tensor([torch.mul(*pair) for pair in ce_b])
+    ce = torch.abs(ce) if absolute else ce
+    return ce
+
+
+def get_ce_b(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Tensor, bin_size: int = c.k) -> \
         torch.Tensor:
     """
 
@@ -39,11 +52,10 @@ def get_ce(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.Te
     boundaries = get_boundaries(bin_size)
     b_by_conf = torch.bucketize(y_conf_1d, boundaries) - 1
 
-    ce = [get_ce_per_bucket(b, b_by_conf, y_conf_1d, y_pred_true) for b in range(bin_size)]
-    ce = torch.tensor(ce)
+    ce_b = [get_ce_per_bucket(b, b_by_conf, y_conf_1d, y_pred_true) for b in range(bin_size)]
+    ce_b = torch.tensor(ce_b)
 
-    return ce
-
+    return ce_b
 
 
 def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.Tensor, torch.Tensor]:
@@ -81,7 +93,7 @@ def get_confusion_matrix(y_true: torch.Tensor, y_pred: torch.Tensor, n_class: in
     assert y_true.dim() == 1
     assert y_pred.dim() == 1
 
-    if not cm_last: cm_last = init_confusion_matrix(n_class)
+    if cm_last is None: cm_last = init_confusion_matrix(n_class)
     y_true = y_true.int()
     y_pred = y_pred.int()
     cm = cm_last.clone().detach().requires_grad_(False)
@@ -126,20 +138,21 @@ def get_y_pred_true(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor):
     return out
 
 
-def plot_ce(ce, save_path: str, bin_size: int = c.k):
+def plot_ce(ce, save_path: Path, bin_size: int = c.k, batch_size: int = c.batch_size_test):
     assert len(ce) == bin_size
+    ce = torch.abs(ce) / batch_size
 
     boundaries = get_boundaries(bin_size)
-    ce = [float(ce_per_b[0]) for ce_per_b in ce]
+    ce = [float(ce_per_b) for ce_per_b in ce]
     plt.bar(boundaries[1:]-1/(2*bin_size), ce, width=1/bin_size)
     plt.title("Calibrated Error over %i Bins" % bin_size)
     plt.xticks(boundaries)
-    plt.savefig(save_path)
+    plt.savefig(str(save_path))
 
     plt.clf()
 
 
-def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r):
+def plot_confusion_matrix(cm: torch.Tensor, save_path: Path, cmap=plt.cm.gray_r):
     dim_cm = cm.shape[0]
     plt.matshow(cm, cmap=cmap)
     plt.title("Confusion Matrix")
@@ -149,7 +162,7 @@ def plot_confusion_matrix(cm: torch.Tensor, save_path: str, cmap=plt.cm.gray_r):
     plt.yticks(tick_marks, range(dim_cm))
     plt.ylabel("True class")
     plt.xlabel("Predicted class")
-    plt.savefig(save_path)
+    plt.savefig(str(save_path))
 
     plt.clf()
 

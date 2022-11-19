@@ -12,16 +12,15 @@ from torch.utils.data import DataLoader
 torch.manual_seed(c.random_seed)
 
 
-def init_folders(session_id):
+def init_folders():
     """
     This script simulates database environment with file system.
     Create needed folders.
     :return:
     """
-    folders = [c.res_folder_name, c.FP_folder_name]
-    os.makedirs(session_id, exist_ok=True)
+    folders = [c.fp_folder_path, c.data_folder_path]
     for folder in folders:
-        os.makedirs(session_id/Path(folder), exist_ok=True)
+        os.makedirs(Path(folder), exist_ok=True)
 
 
 def load_model(model: str):
@@ -40,7 +39,6 @@ def get_MNIST_test_set(folder_path: str):
     :return:
     """
     dataset = datasets.ImageFolder(folder_path, transform=transforms.Compose([
-        transforms.Grayscale(),
         transforms.ToTensor(),
     ]),
                                    target_transform=transforms.Compose([
@@ -50,8 +48,8 @@ def get_MNIST_test_set(folder_path: str):
 
 
 def get_dataloader(dataset, batch_size: int = c.batch_size_test, shuffle: bool = c.shuffle_dataloader):
-    dataset = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
-    return dataset
+    dl = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    return dl
 
 
 def load_img(img_path: str):
@@ -76,5 +74,13 @@ def get_session_id(raw_model_ids: str, dataset_id: str):
 def get_boundaries(bin_size: int = c.k):
     return torch.arange(0, 1.01, 1 / bin_size)
 
+
+def batch_eval(model, x):
+    model.eval()
+    with torch.no_grad():
+        logits = model.forward(x)
+        probs = torch.sigmoid(logits)
+        preds = torch.argmax(probs, dim=1)
+    return preds, probs
 
 
