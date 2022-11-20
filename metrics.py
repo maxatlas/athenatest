@@ -20,9 +20,9 @@ def get_ece(ce_b, batch_size: int):
     # sum the absolute of product
 
     # if CE is the initialized one (all zeros), return negative value to indicate nan.
-    if all(ce_b[:, 0]) == 0:
+    if sum(ce_b[:, 0]) == 0:
         return torch.tensor(-0.1)
-    ece = sum(ce_b[:, 0].nan_to_num(0).abs()) / batch_size
+    ece = sum(ce_b[:, 0].abs()) / batch_size
     return ece
 
 
@@ -76,7 +76,7 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     indices_b = (b_by_conf == b).int()
     bucket_size = sum(indices_b)
     if bucket_size == 0:
-        return torch.tensor(torch.nan), torch.tensor(1)
+        return torch.tensor(0), torch.tensor(0)
     # sum of predicted confidence under bucket b
     y_conf_b = torch.sum(torch.mul(y_conf_1d, indices_b))
     # number of correctly predicted samples under bucket b
@@ -154,7 +154,7 @@ def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tens
 
 def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
     assert len(ce) == bin_size
-    ce = (ce / batch_size).nan_to_num(-0.1)
+    ce = ce.detach().clone().nan_to_num(-0.1) / batch_size
 
     bin_size = bin_size.to("cpu")
     boundaries = get_boundaries(bin_size)

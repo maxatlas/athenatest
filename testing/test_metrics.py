@@ -111,23 +111,20 @@ def test_agg_ce():
     ece_agg = get_ece(ce_agg, b1+b2)
 
     ce = get_ce(ce)
-    ce_1 = get_ce(ce_1)
-    ce_2 = get_ce(ce_2)
-    ce_agg = (ce_1 + ce_2)
+    ce_agg = get_ce(ce_agg)
 
     plot_ce(ce, batch_size=b, save_path="%s/ce_MNIST_agg.png" % c.test_output_folder)
-    plot_ce(ce_1, batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
-    plot_ce(ce_1, batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
+    plot_ce(get_ce(ce_1), batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
+    plot_ce(get_ce(ce_2), batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
 
-
-    assert all(torch.isclose(ce, ce_agg))
+    assert all(torch.isclose(ce.nan_to_num(0), ce_agg.nan_to_num(0)))
     assert ece.isclose(ece_agg)
 
 
 if __name__ == "__main__":
-    # test_agg_ce()
-    # test_get_y_conf_1d()
-    # test_get_y_pred_true()
-    # test_cm()
+    test_agg_ce()
+    test_get_y_conf_1d()
+    test_get_y_pred_true()
+    test_cm()
     test_ece_mce()
 
