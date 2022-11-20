@@ -20,14 +20,14 @@ parser.add_argument('--data',
 parser.add_argument('--model',
                     '-m',
                     type=str,
-                    default="tiny")
+                    default=c.model)
 parser.add_argument('--device',
                     type=str,
-                    default="cpu")
+                    default=c.device)
 parser.add_argument("--save_fp",
                     "-s",
                     type=bool,
-                    default=False)
+                    default=c.save_fp)
 parser.add_argument('--acc_thresh',
                     '-t',
                     type=float,
@@ -72,7 +72,6 @@ for batch_id, (X, y) in enumerate(test_loader):
         fp_samples = save_FP_samples(batch_id, test_loader.dataset.classes, X,
                                      y_pred_1d=y_pred, y_true_1d=y,
                                      save_path=c.fp_folder_path)
-# get overall ECE value.
 ce = get_ce(ce_b)
 ece = get_ece(ce_b, batch_size=dataset_size)
 mce = get_mce(ce)
@@ -81,7 +80,7 @@ print("ECE value:", float(ece))
 print("MCE value:", float(mce))
 
 """Plotting"""
-plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
+plot_ce(ce, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
 plot_confusion_matrix(cm, Path(c.res_folder_path)/"confusion_matrix.png")
 
 print("\nPlots saved at", c.res_folder_path)
