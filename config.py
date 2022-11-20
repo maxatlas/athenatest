@@ -6,7 +6,7 @@ Define hyper-parameters here.
 delimiter = "+"
 min_n = 20
 
-accuracy_threshold = 0.5
+accuracy_threshold = 0
 
 res_folder_path = "../results"
 fp_folder_path = "%s/false_positives" % res_folder_path

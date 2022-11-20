@@ -26,7 +26,7 @@ def test_get_y_pred_true():
     assert out == [0, 0, 1], "wrong output for metrics.get_y_pred_true()"
 
 
-def test_get_ece():
+def test_ece_mce():
     bin_size = torch.tensor(3)
 
     y_pred_1d = torch.tensor([0, 2, 2, 4, 0, 1, 1, 3, 3, 4])
@@ -57,7 +57,7 @@ def test_get_ece():
     assert round(float(mce), 3) == 0.390, "wrong mce"
 
     ce = torch.tensor([])
-    get_ece(ce)
+    assert get_ece(ce, batch_size) == 0.0
 
 
 def test_cm():
@@ -121,9 +121,9 @@ def test_agg_ce():
 
 
 if __name__ == "__main__":
-    test_agg_ce()
+    # test_agg_ce()
     # test_get_y_conf_1d()
     # test_get_y_pred_true()
     # test_cm()
-    # test_get_ece()
+    test_ece_mce()
 

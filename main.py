@@ -40,8 +40,8 @@ device, save_fp, acc_thresh = args.device, args.save_fp, args.acc_thresh
 
 init_folders()
 
-"""Load models and dataset per identifiers"""
-test_loader = get_dataloader(get_test_set(c.data_folder_path, pad=2))
+"""Load model and dataset per identifiers"""
+test_loader = get_dataloader(get_test_set(c.data_folder_path, pad=c.pad))
 n_class = len(test_loader.dataset.classes)
 dataset_size = len(test_loader.dataset)
 print("\nDataset loaded from %s." % data_path)
@@ -51,8 +51,8 @@ print("\nConvNext %s loaded." % model_i)
 bin_size, acc_thresh = torch.tensor(c.k).to(device), torch.tensor(acc_thresh).to(device)
 
 """Evaluate model"""
-eval_res = {}
-ce, mce, cm = torch.zeros(c.k), -1, init_confusion_matrix(n_class)
+ce, mce, cm = torch.zeros(c.k), torch.tensor(-1), init_confusion_matrix(n_class)
+
 for batch_id, (X, y) in enumerate(test_loader):
     X, y = X.to(device), y.to(device)
     y_pred, y_conf = batch_eval(model, X)
@@ -68,18 +68,19 @@ for batch_id, (X, y) in enumerate(test_loader):
     # get current MCE value
     mce_cur = get_mce(ce_b)
     mce = mce_cur if mce_cur > mce else mce
-    # get list of product of CE and bucket_size
+    # aggregate product of (CE and bucket_size)
     ce += get_ce(ce_b)
 
     cm = get_confusion_matrix(y, y_pred, n_class=n_class, cm_last=cm)
+
     if save_fp:
         fp_samples = save_FP_samples(batch_id, test_loader.dataset.classes, X,
                                      y_pred_1d=y_pred, y_true_1d=y,
                                      save_path=c.fp_folder_path)
-
+# get overall ECE value.
 ece = get_ece(ce, batch_size=dataset_size)
 
-"""Store results to no/sql database/ whatever logging system in place."""
+"""Plotting"""
 plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
 plot_confusion_matrix(cm, Path(c.res_folder_path)/"confusion_matrix.png")
 

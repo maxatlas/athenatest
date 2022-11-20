@@ -5,8 +5,13 @@ from pathlib import Path
 from utils import get_boundaries
 
 
-def get_mce(ce_b):
-    mce = max([torch.abs(ce_by_b[0]) for ce_by_b in ce_b])
+def get_mce(ce_b: torch.Tensor) -> torch.Tensor:
+    """
+    Calculate MCE
+    :param ce_b:
+    :return:
+    """
+    mce = torch.max(ce_b, dim=0).values[0]
     return mce
 
 
@@ -149,6 +154,7 @@ def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tens
 def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
     assert len(ce) == bin_size
     ce = torch.abs(ce) / batch_size
+    ce = ce.nan_to_num(-0.1)
 
     bin_size = bin_size.to("cpu")
     boundaries = get_boundaries(bin_size)
