@@ -5,33 +5,34 @@ from pathlib import Path
 from utils import get_boundaries
 
 
-def get_mce(ce_b: torch.Tensor) -> torch.Tensor:
+def get_mce(ce: torch.Tensor) -> torch.Tensor:
     """
     Calculate MCE
-    :param ce_b:
+    :param ce:
     :return:
     """
-    mce = torch.max(ce_b, dim=0).values[0]
+    mce = torch.max(torch.abs(ce).nan_to_num(-0.1))
     return mce
 
 
-def get_ece(ce, batch_size: int):
+def get_ece(ce_b, batch_size: int):
     # CE per bucket * size of bucket
     # sum the absolute of product
-    ece = sum(torch.abs(ce)) / batch_size
+
+    # if CE is the initialized one (all zeros), return negative value to indicate nan.
+    if all(ce_b[:, 0]) == 0:
+        return torch.tensor(-0.1)
+    ece = sum(ce_b[:, 0].nan_to_num(0).abs()) / batch_size
     return ece
 
 
-def get_ce(ce_b, absolute=False):
+def get_ce(ce_b):
     """
 
     :param ce_b: torch.tensor([+/-CE per bucket, size of bucket])
-    :param absolute: return the absolute tensor if true, for ece/mce calculation;
-                     change nothing if false, for CE aggregation over batches.
     :return: torch.tensor([CE per bucket * size of bucket])
     """
-    ce = torch.tensor([torch.mul(*pair) for pair in ce_b])
-    ce = torch.abs(ce) if absolute else ce
+    ce = torch.tensor([torch.div(*pair) for pair in ce_b]).abs()
     return ce
 
 
@@ -80,7 +81,7 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     y_conf_b = torch.sum(torch.mul(y_conf_1d, indices_b))
     # number of correctly predicted samples under bucket b
     y_pred_b = torch.sum(torch.mul(y_pred_true, indices_b))
-    ce_per_b = (y_pred_b - y_conf_b) / bucket_size
+    ce_per_b = (y_pred_b - y_conf_b)
     return ce_per_b, bucket_size
 
 
@@ -153,8 +154,7 @@ def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tens
 
 def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
     assert len(ce) == bin_size
-    ce = torch.abs(ce) / batch_size
-    ce = ce.nan_to_num(-0.1)
+    ce = (ce / batch_size).nan_to_num(-0.1)
 
     bin_size = bin_size.to("cpu")
     boundaries = get_boundaries(bin_size)

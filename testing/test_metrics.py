@@ -46,18 +46,20 @@ def test_ece_mce():
 
     batch_size = len(y_pred_1d)
     ce_b = get_ce_b(y_pred_1d, y_conf_2d, y_true_1d, bin_size=bin_size)
-    ce = get_ce(ce_b, absolute=True)
+    ce = get_ce(ce_b)
 
-    ece = get_ece(ce, batch_size=batch_size)
-    mce = get_mce(ce_b)
+    ece = get_ece(ce_b, batch_size=batch_size)
+    mce = get_mce(ce)
 
     plot_ce(ce, batch_size=batch_size, save_path=Path(c.test_output_folder)/"ce.png", bin_size=bin_size)
 
     assert round(float(ece), 3) == 0.192, "wrong ece"
     assert round(float(mce), 3) == 0.390, "wrong mce"
 
-    ce = torch.tensor([])
-    assert get_ece(ce, batch_size) == 0.0
+    ce_b = torch.zeros(bin_size, 2)
+    ce = get_ce(ce_b)
+    assert get_mce(ce) == -0.1
+    assert get_ece(ce_b, batch_size) == -0.1
 
 
 def test_cm():
@@ -103,6 +105,10 @@ def test_agg_ce():
     ce = get_ce_b(y_pred, y_conf, y_true)
     ce_1 = get_ce_b(y_pred_1, y_conf_1, y_true_1)
     ce_2 = get_ce_b(y_pred_2, y_conf_2, y_true_2)
+    ce_agg = (ce_1 + ce_2)
+
+    ece = get_ece(ce, b1+b2)
+    ece_agg = get_ece(ce_agg, b1+b2)
 
     ce = get_ce(ce)
     ce_1 = get_ce(ce_1)
@@ -113,8 +119,6 @@ def test_agg_ce():
     plot_ce(ce_1, batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
     plot_ce(ce_1, batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
 
-    ece = get_ece(ce, b1+b2)
-    ece_agg = get_ece(ce_agg, b1+b2)
 
     assert all(torch.isclose(ce, ce_agg))
     assert ece.isclose(ece_agg)

@@ -51,7 +51,7 @@ print("\nConvNext %s loaded." % model_i)
 bin_size, acc_thresh = torch.tensor(c.k).to(device), torch.tensor(acc_thresh).to(device)
 
 """Evaluate model"""
-ce, mce, cm = torch.zeros(c.k), torch.tensor(-1), init_confusion_matrix(n_class)
+ce_b, cm = torch.zeros(c.k, 2), init_confusion_matrix(n_class)
 
 for batch_id, (X, y) in enumerate(test_loader):
     X, y = X.to(device), y.to(device)
@@ -63,13 +63,8 @@ for batch_id, (X, y) in enumerate(test_loader):
         warnings.warn("WARNING: Model accuracy below set threshold. Terminating evaluation now...")
         break
 
-    # get list of CE value and bucket_size pair
-    ce_b = get_ce_b(y_pred, y_conf, y, bin_size)
-    # get current MCE value
-    mce_cur = get_mce(ce_b)
-    mce = mce_cur if mce_cur > mce else mce
-    # aggregate product of (CE and bucket_size)
-    ce += get_ce(ce_b)
+    # aggregate list of CE value and bucket_size pair
+    ce_b += get_ce_b(y_pred, y_conf, y, bin_size)
 
     cm = get_confusion_matrix(y, y_pred, n_class=n_class, cm_last=cm)
 
@@ -78,7 +73,12 @@ for batch_id, (X, y) in enumerate(test_loader):
                                      y_pred_1d=y_pred, y_true_1d=y,
                                      save_path=c.fp_folder_path)
 # get overall ECE value.
-ece = get_ece(ce, batch_size=dataset_size)
+ce = get_ce(ce_b)
+ece = get_ece(ce_b, batch_size=dataset_size)
+
+mce = get_mce(ce)
+print(ece)
+print(mce)
 
 """Plotting"""
 plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")

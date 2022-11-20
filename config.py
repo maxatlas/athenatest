@@ -13,7 +13,7 @@ random_seed = 122
 
 k = 10
 
-data_folder_path = "../data/cifar10/test"
+data_folder_path = "../data/mnist/test"
 test_output_folder = "vis/"
 shuffle_dataloader = True
 
