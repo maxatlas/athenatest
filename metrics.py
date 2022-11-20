@@ -7,15 +7,21 @@ from utils import get_boundaries
 
 def get_mce(ce: torch.Tensor) -> torch.Tensor:
     """
-    Calculate MCE
-    :param ce:
-    :return:
+
+    :param ce: torch.tensor([avg +/-CE per bucket])
+    :return: MCE value
     """
     mce = torch.max(torch.abs(ce).nan_to_num(-0.1))
     return mce
 
 
-def get_ece(ce_b, batch_size: int):
+def get_ece(ce_b: torch.Tensor, batch_size: int) -> torch.Tensor:
+    """
+
+    :param ce_b: torch.tensor([+/-CE per bucket, bucket_size])
+    :param batch_size: total number of samples involved
+    :return: ECE value
+    """
     # CE per bucket * size of bucket
     # sum the absolute of product
 
@@ -26,11 +32,11 @@ def get_ece(ce_b, batch_size: int):
     return ece
 
 
-def get_ce(ce_b):
+def get_ce(ce_b: torch.Tensor) -> torch.Tensor:
     """
 
     :param ce_b: torch.tensor([+/-CE per bucket, size of bucket])
-    :return: torch.tensor([CE per bucket * size of bucket])
+    :return: torch.tensor([CE per bucket / bucket_size])
     """
     ce = torch.tensor([torch.div(*pair) for pair in ce_b]).abs()
     return ce
@@ -44,7 +50,7 @@ def get_ce_b(y_pred_1d: torch.Tensor, y_conf_2d: torch.Tensor, y_true_1d: torch.
     :param y_conf_2d: 2d vec of confidence score of shape (batch_size, n_class)
     :param y_true_1d: 1d vec of true labels
     :param bin_size: used to generate boundaries.
-    :return: torch.tensor([(un-absolute CE per bucket, size of bucket)])
+    :return: torch.tensor([(correct_prediction_sum - confidence_sum, bucket_size)])
     """
     assert y_pred_1d.dim() == 1
     assert y_conf_2d.dim() == 2
@@ -71,7 +77,7 @@ def get_ce_per_bucket(b: int, b_by_conf, y_conf_1d, y_pred_true) -> tuple[torch.
     :param b_by_conf: list of bucket indices per confidence score.
     :param y_conf_1d: 1d vec of confidence scores for predicted labels only
     :param y_pred_true: 1d vec of binary prediction for true labels only
-    :return: (un-absolute CE per bucket, size of bucket)
+    :return: (correct_prediction_sum - confidence_sum, bucket_size)
     """
     indices_b = (b_by_conf == b).int()
     bucket_size = sum(indices_b)
@@ -152,9 +158,9 @@ def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tens
     return acc
 
 
-def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k), batch_size: int = c.batch_size_test):
+def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k)):
     assert len(ce) == bin_size
-    ce = ce.detach().clone().nan_to_num(-0.1) / batch_size
+    ce = ce.detach().clone().nan_to_num(-0.1)
 
     bin_size = bin_size.to("cpu")
     boundaries = get_boundaries(bin_size)
