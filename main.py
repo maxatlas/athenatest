@@ -46,7 +46,7 @@ n_class = len(test_loader.dataset.classes)
 dataset_size = len(test_loader.dataset)
 print("\nDataset loaded from %s." % data_path)
 model = load_model(model_i, n_class).to(device)
-print("\nConvNext %s loaded." % model_i)
+print("\nModel ConvNext %s loaded.\n" % model_i)
 
 bin_size, acc_thresh = torch.tensor(c.k).to(device), torch.tensor(acc_thresh).to(device)
 
@@ -75,15 +75,16 @@ for batch_id, (X, y) in enumerate(test_loader):
 # get overall ECE value.
 ce = get_ce(ce_b)
 ece = get_ece(ce_b, batch_size=dataset_size)
-
 mce = get_mce(ce)
-print(ece)
-print(mce)
+
+print("ECE value:", float(ece))
+print("MCE value:", float(mce))
 
 """Plotting"""
 plot_ce(ce, batch_size=dataset_size, bin_size=bin_size, save_path=Path(c.res_folder_path)/"calibration_graph.png")
 plot_confusion_matrix(cm, Path(c.res_folder_path)/"confusion_matrix.png")
 
+print("\nPlots saved at", c.res_folder_path)
 
 """Model Improvement"""
 # Model improvement only works on single model evaluation session.
