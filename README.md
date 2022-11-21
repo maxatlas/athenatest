@@ -62,37 +62,65 @@ The script components can be divided into two blocks - **running** and **testing
 ## Techniques Employed
 
 ### Early Stopping
-By setting parameter acc_thresh to value above **0**, this behavior is activated.
+Set parameter acc_thresh to value above **0** to enable this behavior.
 
-The script will return
 ```diff
 - UserWarning: Model accuracy below set threshold. Terminating evaluation now...
 ```
+Assume dataloader randomly shuffles, if accuracy for the first batch is lower than set threshold, the script will terminate batch iteration and return CE and save plots for this batch.
 
-### Test script Logic
-For easier code maintenance. 
+### Testing Logic
+In case of any changes to the scripts or using scripts on new inputs, tests against functions are created to quickly examine the validity of function or compatibility between new input and the function to save debugging efforts. Testing scripts are saved in *testing* sub-folder.
+
+The tests are to assert matching of set input-out pairs that are designed to handle different case scenarios (except plot tests which relies on manual check of plots). For example, 2 cases are covered for MCE, ECE tests - when some bins are of 0 count vs. all bins are of 0 count:
+```python
+    assert round(float(ece), 3) == 0.192, "wrong ECE for normal CE"
+    assert round(float(mce), 3) == 0.390, "wrong mce for normal CE"
+
+    assert get_mce(ce) == -0.1, "wrong MCE for all non-existent CE"
+    assert get_ece(ce_b, batch_size) == -0.1, "wrong ECE for all non-existent CE"
+```
+
+For confusion matrix test, 3 scenarios are covered - when some prediction is correct / all are correct / prediction and label set is empty:
+```python
+    cm = get_confusion_matrix(y_pred, y_true, n_class=class_size)
+    assert cm.tolist() == [[2, 2, 1],
+                           [0, 2, 1],
+                           [1, 0, 1]], "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_normal")
+
+    cm = get_confusion_matrix(y_pred, y_pred, n_class=class_size)
+    assert cm.tolist() == [[3, 0, 0],
+                           [0, 4, 0],
+                           [0, 0, 3]], "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_all_correct")
+
+    cm = get_confusion_matrix(torch.tensor([]), torch.tensor([]), n_class=class_size)
+    assert cm.tolist() == torch.zeros(class_size, class_size).int().tolist(), \
+        "wrong confusion matrix computation"
+    test_plot_cm(cm, "cm_empty")
+```
+
+**Note**: Need to pass all tests before branch merge.
+
 
 ### False Positives Improvement
-Dimension reduction + some clustering techniques.
+The idea is to reduce data dimensionality and perform clustering on the lower D dataset.
 
+This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ## Future Integration
-* More metrics
+* ### More metrics
 
-  For better evaluation and debugging potential, including more metrics to evaluate against will definitely help.
-
-
-* Train
-  
-  Integrate with Training.
+  For better evaluation and debugging potential, including more metrics and visualization of metrics will definitely improve usability. For example, for classification task, precision, recall, accuracy, ROC and AUC can be included and visualized.
 
 
-* Database API
+* ### Database Integration
 
-  Record past outcomes of eval sessions.
+  Currently, the evaluation outcomes are saved locally, rerun of the script unless change save path will write over past records. Integration with database, submitting session-id and metric value via database API will allow past session lookup, and for visual comparison with tools like tensorboard.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -101,11 +129,9 @@ Dimension reduction + some clustering techniques.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get started, please install the required packages with pip.
-
 ### Prerequisites
 
-Install the prerequisites with pip.
+Install the required packages with pip to get started.
 * pip
   ```sh
   pip install -r requirements.txt
