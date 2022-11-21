@@ -103,7 +103,7 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
 <p align="right">(<a href="#table-of-content">back to top</a>)</p>
 
 
-## Future Integration
+## Limitation and Improvement
 * ### More metrics
 
   For better evaluation and debugging potential, including more metrics and visualization of metrics will definitely improve usability. For example, for classification task, precision, recall, accuracy, ROC and AUC can be included and visualized.
