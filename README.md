@@ -10,6 +10,7 @@
   * [False Positives Improvement](#false-positives-improvement)
 - [Limitation and Integration](#limitation-and-improvement)
   * [Padding](#padding)
+  * [Better Early Stopping](#better-early-stopping)
   * [More metrics](#more-metrics)
   * [Database Integration](#database-integration)
 - [Getting Started](#getting-started)
