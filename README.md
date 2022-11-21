@@ -55,7 +55,7 @@ Script *main.py* gives the following output:
 ![code-structure-breakdown](img/code-structure-breakdown.png)
 The script components can be divided into two blocks - **running** and **testing**. The order of import and reasons are demonstrated in above diagram. 
 
-**Note**: The five inputs can be set alternatively with config.py as well as other hyper-parameters.
+**Note**: The 5 input params can be set alternatively with config.py as well as other hyper parameters.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -65,7 +65,7 @@ The script components can be divided into two blocks - **running** and **testing
 By setting parameter acc_thresh to value above **0**, this behavior is activated.
 
 The script will return
-```
+```diff
 - UserWarning: Model accuracy below set threshold. Terminating evaluation now...
 ```
 
