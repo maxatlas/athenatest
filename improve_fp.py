@@ -19,7 +19,7 @@ def eval_model(fp_folder: Path = c.fp_folder_path):
     fp = utils.get_dataloader(fp, batch_size=len(fp))
 
     n_class = len(fp.dataset.classes)
-    model = Model(n_class=n_class)
+    model = Model(n_class=n_class, n_cluster=c.n_cluster)
 
     _, (X, y) = next(enumerate(fp))
     y_pred = model(X, y)
@@ -32,7 +32,7 @@ def eval_model(fp_folder: Path = c.fp_folder_path):
 
 
 class Model(torch.nn.Module):
-    def __init__(self, n_class: int, n_cluster: int = 256):
+    def __init__(self, n_class: int, n_cluster: int):
         super(Model, self).__init__()
         self.n_class = n_class
         self.n_cluster = n_cluster

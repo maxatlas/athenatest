@@ -22,3 +22,5 @@ shuffle_dataloader = True
 
 pad = 2  # image padding. pad < 2 will break MNIST eval
 testing_limit = 3  # Use 3 samples for fp save test
+
+n_cluster = 256  # Kmeans cluster
