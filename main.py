@@ -60,7 +60,7 @@ for batch_id, (X, y) in enumerate(test_loader):
     # early stopping
     acc = get_accuracy(y_pred, y)
     if acc < acc_thresh:
-        warnings.warn("WARNING: Model accuracy below set threshold. Terminating evaluation now...")
+        warnings.warn("Model accuracy below set threshold. Terminating evaluation now...")
         break
 
     # aggregate list of CE value and bucket_size pair
