@@ -35,6 +35,9 @@
 ## Project Overview
 This is a python script to evaluate the performance of a classification model. The script is designed to help a fellow Data Scientist asses the performance of a model and potentially debug / or assure their model’s performance. 
 
+### Built with
+Python3.10
+
 ### IO Diagram
 ![scriptIO](img/scriptIO.png)
 The script *main.py* takes in 5 parameters:
@@ -145,8 +148,23 @@ Install the required packages with pip to get started.
 ## Usage
 
 ### Running
+Can simply run with parameters readily defined in **config.py**:
+```commandline
+python3 main.py
+```
+Otherwise, please define them with commandline:
+```commandline
+python3 main.py -d dataset/mnist/test -m base -t 0.2 -s true --device cpu
+```
 
 ### Testing
-
-
+To run individual script:
+```commandline
+python3 test_metrics.py
+```
+To run all:
+```commandline
+sh run.sh
+```
+The testing plots and false positives are saved in *testing/vis* and *testing/results/false_positives*
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
