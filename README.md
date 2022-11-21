@@ -1,6 +1,5 @@
 <!-- TABLE OF CONTENTS -->
 ## Table of Content
-<summary></summary>
 <ol>
   <li>
     <a href="#about-the-project">Project Overview</a>
@@ -45,7 +44,7 @@ The script *main.py* takes in 5 parameters:
 * **acc_thresh** - default to 0. If > 0, the early stopping procedure will be activated.
 * **device** - default to 'cuda:0'.
 
-Script *main.py* gives output:
+Script *main.py* gives the following output:
 * Plots for calibrated errors and confusion matrix are saved in *results*.
 * ECE and MCE values are printed on-screen.
 * False positive samples are stored in *results/false_positives*.
@@ -54,15 +53,21 @@ Script *main.py* gives output:
 ### Script Component Diagram
 
 ![code-structure-breakdown](img/code-structure-breakdown.png)
-The script components can be divided into two blocks - **running** and **testing**. The order of import and reasons are demonstrated in above diagram.
+The script components can be divided into two blocks - **running** and **testing**. The order of import and reasons are demonstrated in above diagram. 
+
+**Note**: The five inputs can be set alternatively with config.py as well as other hyper-parameters.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Techniques Employed
 
 ### Early Stopping
+By setting parameter acc_thresh to value above **0**, this behavior is activated.
 
-
+The script will return
+```
+- UserWarning: Model accuracy below set threshold. Terminating evaluation now...
+```
 
 ### Test script Logic
 For easier code maintenance. 
