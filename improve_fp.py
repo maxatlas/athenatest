@@ -12,9 +12,9 @@ from sklearn.cluster import MiniBatchKMeans
 
 
 def eval_model(fp_folder: Path = c.fp_folder_path):
-    fp = utils.get_test_set(fp_folder, pad=2)
+    fp = utils.get_test_set(fp_folder, pad=c.pad)
     if len(fp) == 0:
-        return None, None
+        return "N/A", "N/A"
 
     fp = utils.get_dataloader(fp, batch_size=len(fp))
 
