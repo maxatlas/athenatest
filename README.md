@@ -123,7 +123,7 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
 * ### Database Integration
 
-  Currently, the evaluation outcomes are saved locally, rerun of the script unless change save path will write over past records. Integration with database, submitting session-id and metric value via database API will allow past session lookup, and for visual comparison with tools like tensorboard.
+  Currently, the evaluation outcomes are saved locally, meaning that rerun of the script unless change save path will write over past records. Integration with database, submitting session-id and metric value via database API will allow past session lookup, and for visual comparison with tools like tensorboard.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
