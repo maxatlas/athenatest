@@ -3,7 +3,7 @@ Define hyper-parameters here.
 
 """
 
-accuracy_threshold = 0.5
+accuracy_threshold = 0
 
 res_folder_path = "results"
 test_fp_folder = "testing/results/false_positives"
