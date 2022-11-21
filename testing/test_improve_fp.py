@@ -19,7 +19,7 @@ def test_get_FP_samples():
 
 def test_save_FP_samples():
     save_FP_samples(0, range(10), X[:3], y_pred[:c.testing_limit], y_1[:c.testing_limit],
-                    "results/false_positives"), "wrong operation for save_FP_samples"
+                    c.fp_folder_path), "wrong operation for save_FP_samples"
 
 
 if __name__ == "__main__":
