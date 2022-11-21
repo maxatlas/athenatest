@@ -103,7 +103,7 @@ The idea is to reduce data dimensionality and perform clustering on the lower D 
 
 This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
-Accuracy increases more than 10 times for both MNIST and CIFAR10 datasets after improving over false positives. 
+Accuracy increases more than 10 times for both MNIST and CIFAR10 datasets after improving over false positives. Change parameter *n_cluster* from config.py to receive different outcomes. *n_cluster* is default to 256.
 
 For example, for ConvNext tiny + MNIST:
 ```commandline
