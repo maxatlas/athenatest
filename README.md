@@ -1,35 +1,23 @@
-<!-- TABLE OF CONTENTS -->
 ## Table of Content
-<ol>
-  <li>
-    <a href="#about-the-project">Project Overview</a>
-    <ul>
-      <li><a href="#io-diagram">IO Diagram</a></li>
-      <li><a href="#code-structure-breakdown">Script Component Diagram</a></li>
-    </ul>
-    </li>
-  <li>
-    <a href="#about-the-project">Techniques Employed</a>
-    <ul>
-      <li><a href="#io-diagram">Early Stopping</a></li>
-      <li><a href="#io-diagram">Testing Logic</a></li>
-      <li><a href="#io-diagram">False Positive Improvement</a></li>
-    </ul>
-  </li>
-  <li>
-      <a href="#io-diagram">Future Integration</a>
-  <li>
-    <a href="#getting-started">Getting Started</a>
-    <ul>
-      <li><a href="#prerequisites">Prerequisites</a></li>
-    </ul>
-  </li>
-  <li><a href="#usage">Usage</a></li>
-  <ul>
-      <li><a href="#prerequisites">Running</a></li>
-      <li><a href="#prerequisites">Testing</a></li>
-  </ul>
-</ol>
+
+- [Project Overview](#project-overview)
+  * [Built with](#built-with)
+  * [IO Diagram](#io-diagram)
+  * [Script Component Diagram](#script-component-diagram)
+- [Techniques Employed](#techniques-employed)
+  * [Early Stopping](#early-stopping)
+  * [Testing Logic](#testing-logic)
+  * [False Positives Improvement](#false-positives-improvement)
+- [Future Integration](#future-integration)
+  * [More metrics](#more-metrics)
+  * [Database Integration](#database-integration)
+- [Getting Started](#getting-started)
+  * [Prerequisites](#prerequisites)
+- [Usage](#usage)
+  * [Running](#running)
+  * [Testing](#testing)
+
+
 
 <!-- ABOUT THE PROJECT -->
 ## Project Overview
