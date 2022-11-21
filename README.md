@@ -8,7 +8,7 @@
   * [Early Stopping](#early-stopping)
   * [Testing Logic](#testing-logic)
   * [False Positives Improvement](#false-positives-improvement)
-- [Future Integration](#limitation-and-improvement)
+- [Limitation and Integration](#limitation-and-improvement)
   * [Padding](#padding)
   * [More metrics](#more-metrics)
   * [Database Integration](#database-integration)
