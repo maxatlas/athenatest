@@ -11,7 +11,7 @@ from metrics import (get_ce, get_ce_b, get_mce, get_ece, plot_ce,
                      get_accuracy)
 from improve_fp import save_FP_samples, eval_model
 
-shutil.rmtree(c.fp_folder_path)
+shutil.rmtree(c.fp_folder_path, ignore_errors=True)
 
 
 """Ask for inputs"""
