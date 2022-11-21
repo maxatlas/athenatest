@@ -113,9 +113,12 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
   - RuntimeError: Calculated padded input size per channel: (1 x 1). Kernel size: (2 x 2). Kernel size can't be greater than actual input size
   ```
   Setting padding to 2 will fix it, but I haven't figured out why due to time limitation and being not familiar with ConvNext model. Adjusting padding automatically will generalize better to wider dataset.
+* ### Better Early Stopping
+  
+  The current early stopping strategy relies solely on accuracy. This could be improved after more metrics are introduced.
 * ### More metrics
 
-  For better evaluation and debugging potential, including more metrics and visualization of metrics will definitely improve usability. For example, for classification task, precision, recall, accuracy, ROC and AUC can be included and visualized.
+  For better evaluation and debugging potential, including more metrics and visualization of metrics will definitely improve usability. For example, for classification task, precision, recall, f1, accuracy, ROC and AUC can be included.
 
 
 * ### Database Integration
