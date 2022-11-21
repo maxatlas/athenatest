@@ -8,7 +8,8 @@
   * [Early Stopping](#early-stopping)
   * [Testing Logic](#testing-logic)
   * [False Positives Improvement](#false-positives-improvement)
-- [Future Integration](#future-integration)
+- [Future Integration](#limitation-and-improvement)
+  * [Padding](#padding)
   * [More metrics](#more-metrics)
   * [Database Integration](#database-integration)
 - [Getting Started](#getting-started)
@@ -24,7 +25,8 @@
 This is a python script to evaluate the performance of a classification model. The script is designed to help a fellow Data Scientist asses the performance of a model and potentially debug / or assure their model’s performance. 
 
 ### Built with
-Python3.10
+[![Python3.10.0](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/downloads/release/python-3100/)
+version 3.10.0
 
 ### IO Diagram
 ![scriptIO](img/scriptIO.png)
@@ -104,6 +106,13 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
 
 ## Limitation and Improvement
+
+* ### Padding
+  CovNext model doesn't work with MNIST dataset with a padding lower than 2. It returns this error:
+  ```diff
+  - RuntimeError: Calculated padded input size per channel: (1 x 1). Kernel size: (2 x 2). Kernel size can't be greater than actual input size
+  ```
+  Setting padding to 2 will fix it, but I haven't figured out why due to time limitation and being not familiar with ConvNext model. Adjusting padding automatically will generalize better to wider dataset.
 * ### More metrics
 
   For better evaluation and debugging potential, including more metrics and visualization of metrics will definitely improve usability. For example, for classification task, precision, recall, accuracy, ROC and AUC can be included and visualized.
@@ -111,7 +120,7 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
 * ### Database Integration
 
-  Currently, the evaluation outcomes are saved locally, meaning that rerun of the script unless change save path will write over past records. Integration with database, submitting session-id and metric values via database API will allow past session lookup, and for visual comparison among sessions with self-made or out-of-shelf tools like tensorboard.
+  Currently, the evaluation outcomes are saved locally, meaning that rerun scripts unless change save path will write over past records. Integration with database, submitting session-id and metric values via database API will allow safer storage and past session lookup, and for visual comparison among sessions with self-made or out-of-shelf tools like tensorboard.
 
 
 <p align="right">(<a href="#table-of-content">back to top</a>)</p>
