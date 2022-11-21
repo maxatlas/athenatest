@@ -12,13 +12,11 @@ from torch.utils.data import DataLoader
 torch.manual_seed(c.random_seed)
 
 
-def init_folders():
+def init_folders(folders=(c.fp_folder_path, c.data_folder_path)):
     """
-    This script simulates database environment with file system.
     Create needed folders.
     :return:
     """
-    folders = [c.fp_folder_path, c.data_folder_path]
     for folder in folders:
         os.makedirs(Path(folder), exist_ok=True)
 
@@ -47,9 +45,8 @@ def load_model(model: str, n_class: int):
     return model
 
 
-def get_test_set(folder_path: Path, pad: int):
+def get_test_set(folder_path: Path, pad: int) -> datasets.ImageFolder:
     """
-
     :param folder_path: string
     :param pad: int
     :return:
@@ -64,7 +61,8 @@ def get_test_set(folder_path: Path, pad: int):
     return dataset
 
 
-def get_dataloader(dataset, batch_size: int = c.batch_size_test, shuffle: bool = c.shuffle_dataloader):
+def get_dataloader(dataset: datasets.ImageFolder, batch_size: int = c.batch_size_test,
+                   shuffle: bool = c.shuffle_dataloader):
     dl = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dl
 
@@ -76,11 +74,7 @@ def load_img(img_path: str):
     return converter(img)
 
 
-def get_boundaries(bin_size: torch.Tensor = torch.tensor(c.k)):
-    return torch.arange(0, 1.01, 1 / bin_size).to(bin_size.device)
-
-
-def batch_eval(model, x):
+def batch_eval(model, x: torch.Tensor):
     model.eval()
     with torch.no_grad():
         logits = model.forward(x)

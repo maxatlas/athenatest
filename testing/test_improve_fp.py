@@ -2,6 +2,8 @@ from improve_fp import *
 from Tester import Tester
 import config as c
 import torch
+import os
+os.makedirs(c.test_fp_folder, exist_ok=True)
 
 tester = Tester()
 X, y_1, y_pred, y_conf = tester.next()
@@ -16,8 +18,8 @@ def test_get_FP_samples():
 
 
 def test_save_FP_samples():
-    save_FP_samples(0, range(10), X[:3], y_pred[:3], y_1[:3], "../results/false_positives"), \
-        "wrong operation for save_FP_samples"
+    save_FP_samples(0, range(10), X[:3], y_pred[:c.testing_limit], y_1[:c.testing_limit],
+                    "testing/results/false_positives"), "wrong operation for save_FP_samples"
 
 
 if __name__ == "__main__":

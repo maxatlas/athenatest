@@ -1,5 +1,7 @@
 from Tester import Tester
 from metrics import *
+import os
+os.makedirs(c.test_plot_folder, exist_ok=True)
 
 tester = Tester()
 _, y_1, y_pred, y_conf = tester.next()
@@ -51,15 +53,15 @@ def test_ece_mce():
     ece = get_ece(ce_b, batch_size=batch_size)
     mce = get_mce(ce)
 
-    plot_ce(ce, batch_size=batch_size, save_path=Path(c.test_output_folder)/"ce.png", bin_size=bin_size)
+    plot_ce(ce, save_path=Path(c.test_plot_folder)/"ce.png", bin_size=bin_size)
 
-    assert round(float(ece), 3) == 0.192, "wrong ece"
-    assert round(float(mce), 3) == 0.390, "wrong mce"
+    assert round(float(ece), 3) == 0.192, "wrong ECE for normal CE"
+    assert round(float(mce), 3) == 0.390, "wrong mce for normal CE"
 
-    ce_b = torch.zeros(bin_size, 2)
+    ce_b = torch.zeros(int(bin_size), 2)
     ce = get_ce(ce_b)
-    assert get_mce(ce) == -0.1
-    assert get_ece(ce_b, batch_size) == -0.1
+    assert get_mce(ce) == -0.1, "wrong MCE for all non-existent CE"
+    assert get_ece(ce_b, batch_size) == -0.1, "wrong ECE for all non-existent CE"
 
 
 def test_cm():
@@ -88,7 +90,7 @@ def test_cm():
 
 
 def test_plot_cm(cm, file_name: str = "cm"):
-    plot_confusion_matrix(cm, Path(c.test_output_folder)/("%s.png" % file_name))
+    plot_confusion_matrix(cm, Path(c.test_plot_folder)/("%s.png" % file_name))
 
 
 def test_agg_ce():
@@ -113,9 +115,9 @@ def test_agg_ce():
     ce = get_ce(ce)
     ce_agg = get_ce(ce_agg)
 
-    plot_ce(ce, batch_size=b, save_path="%s/ce_MNIST_agg.png" % c.test_output_folder)
-    plot_ce(get_ce(ce_1), batch_size=b1, save_path="%s/ce_MNIST_1.png" % c.test_output_folder)
-    plot_ce(get_ce(ce_2), batch_size=b2, save_path="%s/ce_MNIST_2.png" % c.test_output_folder)
+    plot_ce(ce, save_path="%s/ce_MNIST_agg.png" % c.test_plot_folder)
+    plot_ce(get_ce(ce_1), save_path="%s/ce_MNIST_1.png" % c.test_plot_folder)
+    plot_ce(get_ce(ce_2), save_path="%s/ce_MNIST_2.png" % c.test_plot_folder)
 
     assert all(torch.isclose(ce.nan_to_num(0), ce_agg.nan_to_num(0)))
     assert ece.isclose(ece_agg)
