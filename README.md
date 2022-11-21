@@ -22,10 +22,10 @@
 ## About The Project
 
 This is a python script to evaluate the performance of a classification model. The script is designed to help a fellow Data Scientist asses the performance of a model and potentially debug / or assure their model’s performance. The script's IO capacity is as follows:
-![scriptIO](/img/sriptIO.png)
+![scriptIO](img/sriptIO.png)
 
 ### Code structure breakdown
-![code-structure-breakdown](/img/code_structure_breakdown.png)
+![code-structure-breakdown](img/code_structure_breakdown.png)
 **main.py** performs the task by taking in 5 parameters whose value can alternatively be set by **config.py**.
 
 
