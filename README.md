@@ -56,7 +56,7 @@ Script *main.py* gives the following output:
 ### Script Component Diagram
 
 ![code-structure-breakdown](img/code-structure-breakdown.png)
-The script components can be divided into two blocks - **running** and **testing**. The order of import and reasons are demonstrated in above diagram. 
+The script components can be divided into two blocks - **running** and **testing**. The order of import and usages are demonstrated in above diagram. 
 
 **Note**: The 5 input params can be set alternatively with config.py as well as other hyper parameters.
 
