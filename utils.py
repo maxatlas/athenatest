@@ -56,7 +56,7 @@ def get_test_set(folder_path: Path, pad: int) -> datasets.ImageFolder:
         transforms.ToTensor(),
         transforms.Normalize(
             (0.1307,), (0.3081,)
-        )
+        ),
     ]),
                                    target_transform=transforms.Compose([
                                        lambda x: torch.tensor(x), ]),

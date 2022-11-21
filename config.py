@@ -7,7 +7,7 @@ accuracy_threshold = 0
 model = "tiny"
 data_folder_path = "../data/cifar10/test"
 device = "cuda:0"
-save_fp = False
+save_fp = True
 
 
 res_folder_path = "results"
