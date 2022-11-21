@@ -61,7 +61,7 @@ Set parameter acc_thresh to value above **0** to enable this behavior.
 ```diff
 - UserWarning: Model accuracy below set threshold. Terminating evaluation now...
 ```
-Assume dataloader randomly shuffles, if accuracy for the first batch is lower than set threshold, the script will terminate batch iteration and return CE and save plots for this batch.
+Assume dataloader randomly shuffles, if average accuracy is lower than set threshold, the script will terminate batch iteration and carry on with the rest of procedure (return metric values, save plots, save false positives and improve for batches so far).
 
 ### Testing Logic
 In case of any changes to the scripts or using scripts on new inputs, tests against functions are created to quickly examine the validity of function or compatibility between new input and the function to save debugging efforts. Testing scripts are saved in *testing* sub-folder.
