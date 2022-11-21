@@ -148,7 +148,7 @@ Install the required packages with pip to get started.
 ## Usage
 
 ### Running
-Can simply run with parameters readily defined in **config.py**:
+Can simply run main.py with parameters readily defined in **config.py**:
 ```commandline
 python3 main.py
 ```
