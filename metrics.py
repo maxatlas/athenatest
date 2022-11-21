@@ -2,7 +2,6 @@ import torch
 import matplotlib.pyplot as plt
 import config as c
 from pathlib import Path
-from utils import get_boundaries
 
 
 def get_mce(ce: torch.Tensor) -> torch.Tensor:
@@ -156,6 +155,10 @@ def get_accuracy(y_pred_1d: torch.Tensor, y_true_1d: torch.Tensor) -> torch.Tens
 
     acc = sum(y_pred_1d.eq(y_true_1d))/len(y_pred_1d)
     return acc
+
+
+def get_boundaries(bin_size: torch.Tensor = torch.tensor(c.k)) -> torch.Tensor:
+    return torch.arange(0, 1.01, 1 / bin_size).to(bin_size.device)
 
 
 def plot_ce(ce, save_path: Path, bin_size: torch.Tensor = torch.tensor(c.k)):
