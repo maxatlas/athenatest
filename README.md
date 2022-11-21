@@ -103,7 +103,7 @@ The idea is to reduce data dimensionality and perform clustering on the lower D 
 
 This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
-Accuracy improves more than 10 times after improving over false positives for both MNIST and CIFAR10 datasets. 
+Accuracy increases more than 10 times for both MNIST and CIFAR10 datasets after improving over false positives. 
 
 For example, for ConvNext tiny + MNIST:
 ```commandline
