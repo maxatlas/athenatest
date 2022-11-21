@@ -48,7 +48,7 @@ The script components can be divided into two blocks - **running** and **testing
 
 **Note**: The 5 input params can be set alternatively with config.py as well as other hyper parameters.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#table-of-content">back to top</a>)</p>
 
 ## Techniques Employed
 
@@ -100,7 +100,7 @@ The idea is to reduce data dimensionality and perform clustering on the lower D 
 
 This script uses **T-sne** for d-reduction and **K-means** for clustering.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#table-of-content">back to top</a>)</p>
 
 
 ## Future Integration
@@ -114,7 +114,7 @@ This script uses **T-sne** for d-reduction and **K-means** for clustering.
   Currently, the evaluation outcomes are saved locally, meaning that rerun of the script unless change save path will write over past records. Integration with database, submitting session-id and metric values via database API will allow past session lookup, and for visual comparison among sessions with self-made or out-of-shelf tools like tensorboard.
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#table-of-content">back to top</a>)</p>
 
 
 <!-- GETTING STARTED -->
@@ -129,7 +129,7 @@ Install the required packages with pip to get started.
   ```
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#table-of-content">back to top</a>)</p>
 
 
 <!-- USAGE -->
@@ -155,4 +155,4 @@ To run all:
 sh run.sh
 ```
 The testing plots and false positives are saved in *testing/vis* and *testing/results/false_positives*
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#table-of-content">back to top</a>)</p>
